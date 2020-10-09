@@ -1,28 +1,25 @@
 import Telnet from 'telnet-client'
 
-import { zeaDebug } from '../helpers/zeaDebug.js'
+import { zeaDebug } from './helpers/zeaDebug.js'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
 class TelnetStreamer extends BaseStreamer {
-  constructor() {
+  constructor(params) {
     super()
+
+    this.params = params
 
     this.#bootstrapTelnetClient()
   }
 
   async connect() {
-    const envParams = {
-      host: process.env.ZEA_TELNET_HOST,
-      port: process.env.ZEA_TELNET_PORT,
-    }
-
     const params = {
       negotiationMandatory: false,
       initialCTRLC: true,
       initialLFCR: true,
       timeout: 1500,
-      ...envParams,
+      ...this.params,
     }
 
     zeaDebug('TelnetStreamer params:\n%O', params)
@@ -31,8 +28,6 @@ class TelnetStreamer extends BaseStreamer {
   }
 
   async send(data) {
-    super.send(data)
-
     return this.telnet.send('uptime')
   }
 
@@ -45,7 +40,7 @@ class TelnetStreamer extends BaseStreamer {
 
     this.telnet.on('data', (data) => {
       const decoded = data.toString('utf8')
-      this.emit('data', data)
+      this.emit('data', decoded)
     })
 
     this.telnet.on('ready', () => {

@@ -1,8 +1,6 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 
-import { zeaDebug } from '../helpers/zeaDebug.js'
-
 import { BaseStreamer } from './BaseStreamer.js'
 
 class MockStreamer extends BaseStreamer {
@@ -26,12 +24,10 @@ class MockStreamer extends BaseStreamer {
       this.emit('data', arrayMockPoints[tick % arrayMockPoints.length])
 
       tick += 1
-    }, 500)
+    }, 1000)
   }
 
   async send(data) {
-    super.send(data)
-
     return 'SENT FROM MOCK'
   }
 }

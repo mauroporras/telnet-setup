@@ -11,8 +11,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "start:debug": "yarn run nodemon --inspect=0.0.0.0 index.js",
-    "start:watch": "yarn run nodemon index.js"
+    "debug": "yarn run nodemon --inspect=0.0.0.0 index.js",
+    "dev": "yarn run nodemon index.js"
   },
   "type": "module"
 }
