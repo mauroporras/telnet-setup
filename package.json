@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@zeainc/zea-collab": "^4.1.0",
+    "firebase-admin": "^9.5.0",
     "telnet-client": "^1.4.6"
   },
   "devDependencies": {
@@ -10,9 +10,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "node index.js",
-    "debug": "yarn run nodemon --inspect=0.0.0.0 index.js",
-    "dev": "yarn run nodemon index.js"
+    "start": "node --experimental-json-modules index.js",
+    "debug": "yarn run nodemon --experimental-json-modules --inspect=0.0.0.0 index.js",
+    "dev": "yarn run nodemon --experimental-json-modules index.js"
   },
   "type": "module"
 }

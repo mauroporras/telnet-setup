@@ -1,6 +1,7 @@
+import { Db } from './src/Db.js'
 import { MockStreamer } from './src/MockStreamer.js'
 import { TelnetStreamer } from './src/TelnetStreamer.js'
-import { ZeaCollabBridge } from './src/ZeaCollabBridge.js'
+import { StreamerDbBridge } from './src/StreamerDbBridge.js'
 
 const shouldUseMock = process.env.ZEA_STREAMER_TYPE === 'mock'
 
@@ -11,8 +12,8 @@ const streamer = shouldUseMock
       port: process.env.ZEA_TELNET_PORT,
     })
 
-const roomId = process.env.ZEA_COLLAB_ROOM_ID
+const db = new Db()
 
-const zeaCollabBridge = new ZeaCollabBridge(streamer, roomId)
+const streamerDbBridge = new StreamerDbBridge(streamer, db)
 
-await zeaCollabBridge.start()
+await streamerDbBridge.start()

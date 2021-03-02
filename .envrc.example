@@ -1,7 +1,10 @@
-export ZEA_COLLAB_ROOM_ID=foobar
+export DEBUG=zea:*
+
+export GCP_PROJECT_ID=your-gcp-project-id
+
+export FIREBASE_SERVICE_ACCOUNT_KEY_URL=https://url.to/your-firebase-key.json
+
 export ZEA_TELNET_HOST=127.0.0.1
 export ZEA_TELNET_PORT=23
-
-export DEBUG=zea:*
 
 export ZEA_STREAMER_TYPE=mock
