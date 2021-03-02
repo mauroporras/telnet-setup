@@ -4,9 +4,9 @@
     "telnet-client": "^1.4.6"
   },
   "devDependencies": {
-    "debug": "^4.2.0",
-    "nodemon": "^2.0.4",
-    "prettier": "^2.1.2"
+    "debug": "^4.3.1",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1"
   },
   "license": "MIT",
   "scripts": {
