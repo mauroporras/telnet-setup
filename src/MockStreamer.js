@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs'
 import path from 'path'
+import { interval } from 'rxjs'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
@@ -18,17 +19,15 @@ class MockStreamer extends BaseStreamer {
 
     const arrayMockPoints = mockPoints.split('\n')
 
-    let tick = 0
+    const ticks = interval(1000)
 
-    global.setInterval(() => {
-      tick += 1
-
+    ticks.subscribe((tick) => {
       const index = tick % arrayMockPoints.length
 
       const data = arrayMockPoints[index]
 
       data && this.emit('data', data)
-    }, 1000)
+    })
   }
 
   async send(data) {
