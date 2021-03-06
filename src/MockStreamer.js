@@ -21,9 +21,13 @@ class MockStreamer extends BaseStreamer {
     let tick = 0
 
     global.setInterval(() => {
-      this.emit('data', arrayMockPoints[tick % arrayMockPoints.length])
-
       tick += 1
+
+      const index = tick % arrayMockPoints.length
+
+      const data = arrayMockPoints[index]
+
+      data && this.emit('data', data)
     }, 1000)
   }
 
