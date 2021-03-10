@@ -9,7 +9,7 @@ class StreamerDbBridge {
   async start() {
     await this.streamer.connect()
 
-    const res = await this.streamer.send('uptime')
+    //const res = await this.streamer.send('uptime')
 
     this.streamer.on('data', (data) => {
       this.session.addPoint(data)

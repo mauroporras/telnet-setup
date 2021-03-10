@@ -1,3 +1,4 @@
+import net from 'net'
 import Telnet from 'telnet-client'
 
 import { zeaDebug } from './helpers/zeaDebug.js'
@@ -15,16 +16,30 @@ class TelnetStreamer extends BaseStreamer {
 
   async connect() {
     const params = {
-      negotiationMandatory: false,
-      initialCTRLC: true,
-      initialLFCR: true,
-      timeout: 1500,
+      shellPrompt: '',
       ...this.params,
     }
 
+const socket = new net.Socket()
+socket.on('error', (err) => console.log(err))
+socket.on('data', (data) => {
+      const decoded = data.toString('utf8')
+      zeaDebug(decoded)
+      this.emit('data', decoded)
+})
+socket.connect(this.params.port, this.params.host, () => {
+  socket.write('%1POWR 1 ')
+})
+
+return
+
     zeaDebug('TelnetStreamer params:\n%O', params)
 
-    await this.telnet.connect(params)
+    try {
+      await this.telnet.connect(params)
+    } catch (error) {
+      console.info(error)
+    }
   }
 
   async send(data) {
