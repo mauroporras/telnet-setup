@@ -2,7 +2,7 @@
   "dependencies": {
     "firebase-admin": "^9.5.0",
     "rxjs": "^6.6.6",
-    "telnet-client": "^1.4.6"
+    "telnet-client": "^1.4.7"
   },
   "devDependencies": {
     "debug": "^4.3.1",

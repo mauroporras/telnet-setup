@@ -1446,10 +1446,10 @@ teeny-request@^7.0.0:
     stream-events "^1.0.5"
     uuid "^8.0.0"
 
-telnet-client@^1.4.6:
-  version "1.4.6"
-  resolved "https://registry.yarnpkg.com/telnet-client/-/telnet-client-1.4.6.tgz#656effdaafc20539f9c71f5aab5b9d7a1a51b238"
-  integrity sha512-ukejw2Fv02oIRJ18jJw3m7TpEglbtBkrCM7Ci75H9zl7MZIKpaV+1L/TKC3Wy9KDk4tfidIJllv4jhGBBjTZBA==
+telnet-client@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/telnet-client/-/telnet-client-1.4.7.tgz#ae1ed0c659c5e547f937f2623d750b49e2506ec6"
+  integrity sha512-bImFgs5q7DMJHeN2sJJBwG1wiSYqBTIxQUumRqMgCaGkmeD4ehjoTApSooWtjhGC+3hGoNiy/xBQBnwZgxdtaQ==
   dependencies:
     bluebird "^3.5.4"
 
