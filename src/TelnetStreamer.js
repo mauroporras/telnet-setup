@@ -28,7 +28,7 @@ class TelnetStreamer extends BaseStreamer {
   }
 
   async send(data) {
-    return this.telnet.send('uptime')
+    return this.telnet.send(data)
   }
 
   #bootstrapTelnetClient() {
