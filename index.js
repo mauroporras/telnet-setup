@@ -21,3 +21,4 @@ const session = new Session(sessionId, sessionName)
 const streamerDbBridge = new StreamerDbBridge(streamer, session)
 
 await streamerDbBridge.start()
+

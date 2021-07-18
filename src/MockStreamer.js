@@ -22,9 +22,11 @@ class MockStreamer extends BaseStreamer {
     const ticks = interval(1000)
 
     ticks.subscribe((tick) => {
+      console.log(tick)
       const index = tick % arrayMockPoints.length
 
       const data = arrayMockPoints[index]
+      console.log(data)
 
       data && this.emit('data', data)
     })
