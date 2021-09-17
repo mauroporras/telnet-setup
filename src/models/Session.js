@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto'
+
 import { db, serverTimestamp } from '../helpers/firebase.js'
 import { zeaDebug } from '../helpers/zeaDebug.js'
 
@@ -13,16 +15,34 @@ class Session {
 
     this.id = id
     this.name = name
+    this.latestSelectedAnchor = null
   }
 
-  async saveOrFetch() {
+  async fetchOrCreate() {
     const collectionId = 'sessions'
 
-    const docRef = db.collection(collectionId).doc(this.id)
-    const doc = await docRef.get()
+    const sessionRef = db.collection(collectionId).doc(this.id)
+    const doc = await sessionRef.get()
+
+    this.unsubscribe = sessionRef.onSnapshot(
+      (sessionSnapshot) => {
+        if (!sessionSnapshot.exists) {
+          return
+        }
+
+        this.latestSelectedAnchor =
+          sessionSnapshot.data().latestSelectedAnchor || null
+      },
+      (error) => {
+        console.log(`Encountered error: ${error}`)
+      }
+    )
 
     if (doc.exists) {
       zeaDebug("Found existing session with id '%s'", this.id)
+
+      // Clear the latest selected anchor, so a new one can be selected.
+      await sessionRef.update({ latestSelectedAnchor: null })
 
       this.doc = doc
       return
@@ -33,9 +53,9 @@ class Session {
       name: this.name,
     }
 
-    await docRef.set(data)
+    await sessionRef.set(data)
 
-    const createdDoc = await docRef.get()
+    const createdDoc = await sessionRef.get()
 
     this.doc = createdDoc
     this.id = createdDoc.id
@@ -43,29 +63,41 @@ class Session {
     zeaDebug("Created new session with id '%s'", this.id)
   }
 
+  unsubscribe() {
+    if (!this.unsubscribe) {
+      return
+    }
+
+    this.unsubscribe()
+  }
+
   async addPoint(point) {
     if (!this.doc) {
-      await this.saveOrFetch()
+      await this.fetchOrCreate()
     }
 
     const collectionId = 'points'
 
+    const prointId = randomUUID()
+
     const data = {
+      id: prointId,
       createdAt: serverTimestamp(),
       sessionId: this.id,
+      anchor: this.latestSelectedAnchor,
       string: point,
     }
 
-    const docRef = await db.collection(collectionId).add(data)
-    const { id } = docRef
+    const pointRef = db.collection(collectionId).doc(prointId)
+    await pointRef.create(data)
 
     zeaDebug(
-      "New document added to the '%s' collection with id '%s'",
-      collectionId,
-      id
+      "Created new point with id '%s' and anchor '%s'",
+      prointId,
+      this.latestSelectedAnchor
     )
 
-    return id
+    return prointId
   }
 }
 
