@@ -20,18 +20,18 @@ class TelnetStreamer extends BaseStreamer {
       ...this.params,
     }
 
-const socket = new net.Socket()
-socket.on('error', (err) => console.log(err))
-socket.on('data', (data) => {
+    const socket = new net.Socket()
+    socket.on('error', (err) => console.log(err))
+    socket.on('data', (data) => {
       const decoded = data.toString('utf8')
       zeaDebug(decoded)
       this.emit('data', decoded)
-})
-socket.connect(this.params.port, this.params.host, () => {
-  socket.write('%1POWR 1 ')
-})
+    })
+    socket.connect(this.params.port, this.params.host, () => {
+      socket.write('%1POWR 1 ')
+    })
 
-return
+    return
 
     zeaDebug('TelnetStreamer params:\n%O', params)
 
