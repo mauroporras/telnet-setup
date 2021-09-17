@@ -36,3 +36,11 @@ For telnet session with HTTP server:
 ```bash
 GET / HTTP/1.1
 ```
+
+## Deploying Cloud Functions
+
+```bash
+cd functions
+export FIREBASE_PROJECT_ID=some-project-id
+yarn run deploy --project $FIREBASE_PROJECT_ID
+```
