@@ -9,8 +9,10 @@ const shouldUseMock = process.env.ZEA_STREAMER_TYPE === 'mock'
 const streamer = shouldUseMock
   ? new MockStreamer(process.env.ZEA_TEST_POINTS_FILE)
   : new TelnetStreamer({
-      host: process.env.ZEA_TELNET_HOST,
-      port: process.env.ZEA_TELNET_PORT,
+      // host: process.env.ZEA_TELNET_HOST,
+      host: '192.168.1.9',
+      // port: process.env.ZEA_TELNET_PORT,
+      port: 1212,
     })
 
 const sessionId = process.env.ZEA_SESSION_ID

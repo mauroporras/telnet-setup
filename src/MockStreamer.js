@@ -4,6 +4,22 @@ import { interval } from 'rxjs'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
+import processName from './helpers/nameSwap.js'
+
+const outPutText = process.env.file_output
+
+// const processName = (pointData) => {
+//   const nameToSwap = process.env.nameToSwap
+//   //split string into array by deliminator
+
+//   const pointDataList = pointData.split(',')
+//   pointDataList[0]= nameToSwap
+  
+//   const value  = pointDataList.join(',')
+
+//   return value
+// }
+
 class MockStreamer extends BaseStreamer {
   constructor(mockPointsPath) {
     super()
@@ -28,7 +44,27 @@ class MockStreamer extends BaseStreamer {
       const data = arrayMockPoints[index]
       console.log(data)
 
-      data && this.emit('data', data)
+      const nameAdj = processName(data)
+      console.log(nameAdj)
+
+      try {
+        if (fs.access(outPutText)) {
+          fs.appendFile(outPutText, nameAdj, (err) => {
+            if (err) throw err;
+          })
+        }
+        else{
+          fs.writeFile(outPutText, nameAdj, (err) => {
+            appendFile
+            if (err) throw err;
+          })
+        }
+      } catch(err) {
+        console.error(err)
+      }
+      
+
+      data && this.emit('data', nameAdj) 
     })
   }
 

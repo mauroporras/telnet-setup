@@ -5,6 +5,12 @@ import { zeaDebug } from './helpers/zeaDebug.js'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
+import processName from './helpers/nameSwap.js'
+
+import fs  from 'fs'
+
+const outPutText = process.env.file_output
+
 class TelnetStreamer extends BaseStreamer {
   constructor(params) {
     super()
@@ -25,11 +31,48 @@ socket.on('error', (err) => console.log(err))
 socket.on('data', (data) => {
       const decoded = data.toString('utf8')
       zeaDebug(decoded)
-      this.emit('data', decoded)
+      console.log(decoded)
+      //Adjust name
+      const nameAdj = processName(decoded)
+      console.log(nameAdj)
+
+      fs.appendFile(outPutText, nameAdj, (err) => {
+        if (err) throw err;
+      })
+
+      // try {
+      //   if (fs.access(outPutText)) {
+      //     fs.appendFile(outPutText, nameAdj, (err) => {
+      //       if (err) throw err;
+      //     })
+      //   }
+      //   else{
+      //     fs.writeFile(outPutText, nameAdj, (err) => {
+            
+      //       if (err) throw err;
+      //     })
+      //   }
+      // } catch(err) {
+      //   console.error(err)
+      // }
+
+      this.emit('data', nameAdj)
 })
 socket.connect(this.params.port, this.params.host, () => {
   socket.write('%1POWR 1 ')
 })
+
+// const processName = (pointData) => {
+//   const nameToSwap = process.env.nameToSwap
+//   //split string into array by deliminator
+
+//   const pointDataList = pointData.split(',')
+//   pointDataList[0]= nameToSwap
+  
+//   pointDataList.join(',')
+
+//   return pointDataList
+// }
 
 return
 
@@ -55,7 +98,30 @@ return
 
     this.telnet.on('data', (data) => {
       const decoded = data.toString('utf8')
-      this.emit('data', decoded)
+
+      //Adjust name
+      const nameAdj = processName(decoded)
+      console.log(nameAdj)
+
+      try {
+        if (fs.access(outPutText)) {
+          fs.appendFile(outPutText, nameAdj, (err) => {
+            if (err) throw err;
+          })
+        }
+        else{
+          fs.writeFile(outPutText, nameAdj, (err) => {
+            
+            if (err) throw err;
+          })
+        }
+      } catch(err) {
+        console.error(err)
+      }
+
+      //const test = processName(decoded)
+      //console.log(test)
+      this.emit('data', nameAdj)
     })
 
     this.telnet.on('ready', () => {
