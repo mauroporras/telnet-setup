@@ -5,6 +5,8 @@ import { zeaDebug } from './helpers/zeaDebug.js'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
+const outPutText = "C:/Box/Active Projects/190153_Cadet_Chapel_Repairs/Engineering/ZSK/ZSK_210712_SurveyLink/211004_Survey.txt"
+
 class TelnetStreamer extends BaseStreamer {
   constructor(params) {
     super()
@@ -55,6 +57,23 @@ class TelnetStreamer extends BaseStreamer {
 
     this.telnet.on('data', (data) => {
       const decoded = data.toString('utf8')
+
+      try {
+        if (fs.access(outPutText)) {
+          fs.appendFile(outPutText, decoded, (err) => {
+            if (err) throw err;
+          })
+        }
+        else{
+          fs.writeFile(outPutText, decoded, (err) => {
+            
+            if (err) throw err;
+          })
+        }
+      } catch(err) {
+        console.error(err)
+      }
+
       this.emit('data', decoded)
     })
 

@@ -11,6 +11,11 @@ Required:
 ```bash
 export ZEA_TELNET_HOST=127.0.0.1
 export ZEA_TELNET_PORT=23
+
+export ZEA_SESSION_ID=testSelect
+export ZEA_SESSION_NAME=testSelect
+
+setup json key file from account setting
 ```
 
 Optional:
@@ -35,6 +40,14 @@ For telnet session with HTTP server:
 
 ```bash
 GET / HTTP/1.1
+```
+
+## Deploying Cloud Functions
+
+new install and linking functions to firebase project
+```bash
+firebase use --add
+firebase init functions
 ```
 
 ## Deploying Cloud Functions

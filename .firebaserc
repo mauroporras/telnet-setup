@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "development": "zahner-development",
+    "default": "zahner-development"
+  },
+  "targets": {}
+}
