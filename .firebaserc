@@ -1,7 +1,7 @@
 {
   "projects": {
     "development": "zahner-development",
-    "default": "zahner-development"
+    "default": "zahner-production-8e2af"
   },
   "targets": {}
 }

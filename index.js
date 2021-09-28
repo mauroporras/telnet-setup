@@ -4,17 +4,20 @@ import { StreamerDbBridge } from './src/StreamerDbBridge.js'
 
 import { Session } from './src/models/Session.js'
 
-const shouldUseMock = process.env.ZEA_STREAMER_TYPE === 'mock'
+const shouldUseMock = process.env.ZEA_STREAMER_TYPE === 'mock' ? true : false
 
 const streamer = shouldUseMock
   ? new MockStreamer(process.env.ZEA_TEST_POINTS_FILE)
   : new TelnetStreamer({
-      host: process.env.ZEA_TELNET_HOST,
-      port: process.env.ZEA_TELNET_PORT,
+      // host: process.env.ZEA_TELNET_HOST,
+      host: '192.168.1.9',
+      // port: process.env.ZEA_TELNET_PORT,
+      port: 1212,
     })
 
 const sessionId = process.env.ZEA_SESSION_ID
-const sessionName = process.env.ZEA_SESSION_NAME
+// const sessionName = process.env.ZEA_SESSION_NAME
+const sessionName = process.env.ZEA_SESSION_ID
 
 const session = new Session(sessionId, sessionName)
 
