@@ -7,17 +7,17 @@ import { Session } from './src/models/Session.js'
 const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE || ''
 const ZEA_SESSION_ID = process.env.ZEA_SESSION_ID || ''
 
-console.log(
-  'session ',
-  ZEA_STREAMER_TYPE.length,
-  'mock'.length,
-  ZEA_STREAMER_TYPE === 'mock'
-)
-console.log('session ', ZEA_SESSION_ID)
+// console.log(
+//   'session ',
+//   ZEA_STREAMER_TYPE.length,
+//   'mock'.length,
+//   ZEA_STREAMER_TYPE === 'mock'
+// )
+// console.log('session ', ZEA_SESSION_ID)
 
 // const shouldUseMock = process.env.ZEA_STREAMER_TYPE === 'mock' ? true : false
 const shouldUseMock = ZEA_STREAMER_TYPE === 'mock' ? true : false
-console.log('status ', shouldUseMock)
+// console.log('status ', shouldUseMock)
 
 const ZEA_TEST_POINTS_FILE =
   'C:/Box/R&D Services/Restricted/04_Research Trajectories/BROWER SRVY REVIEW/SURVEYLINK_MVP/Mockup/Setup Survey Points.txt'
@@ -39,5 +39,5 @@ const sessionName = ZEA_SESSION_ID
 const session = new Session(sessionId, sessionName)
 
 const streamerDbBridge = new StreamerDbBridge(streamer, session)
-
+console.log('session started ') 
 await streamerDbBridge.start()
