@@ -97,6 +97,8 @@ class Session {
       this.latestSelectedAnchor
     )
 
+    console.log("anchor selected", this.latestSelectedAnchor)
+
     return prointId
   }
 }
