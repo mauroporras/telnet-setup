@@ -4,6 +4,8 @@ import { interval } from 'rxjs'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
+const outPutText = "C:/Box/Active Projects/190153_Cadet_Chapel_Repairs/Engineering/ZSK/ZSK_210712_SurveyLink/211004_MUBC/LogFiles/SurveyLog.txt"
+
 class MockStreamer extends BaseStreamer {
   constructor(mockPointsPath) {
     super()
@@ -25,6 +27,22 @@ class MockStreamer extends BaseStreamer {
       const index = tick % arrayMockPoints.length
 
       const data = arrayMockPoints[index]
+
+      try {
+        if (fs.access(outPutText)) {
+          fs.appendFile(outPutText, data, (err) => {
+            if (err) throw err;
+          })
+        }
+        else{
+          fs.writeFile(outPutText, data, (err) => {
+            
+            if (err) throw err;
+          })
+        }
+      } catch(err) {
+        console.error(err)
+      }
 
       data && this.emit('data', data)
     })

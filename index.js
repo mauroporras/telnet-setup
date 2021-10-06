@@ -7,8 +7,13 @@ import { Session } from './src/models/Session.js'
 const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE || ''
 const ZEA_SESSION_ID = process.env.ZEA_SESSION_ID || ''
 
-console.log('session ', ZEA_STREAMER_TYPE.length, 'mock'.length, ZEA_STREAMER_TYPE === 'mock')
-console.log('session ', typeof ZEA_SESSION_ID)
+console.log(
+  'session ',
+  ZEA_STREAMER_TYPE.length,
+  'mock'.length,
+  ZEA_STREAMER_TYPE === 'mock'
+)
+console.log('session ', ZEA_SESSION_ID)
 
 // const shouldUseMock = process.env.ZEA_STREAMER_TYPE === 'mock' ? true : false
 const shouldUseMock = ZEA_STREAMER_TYPE === 'mock' ? true : false
