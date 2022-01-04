@@ -26,8 +26,8 @@ const streamer = shouldUseMock
   ? // ? new MockStreamer(process.env.ZEA_TEST_POINTS_FILE)
     new MockStreamer(ZEA_TEST_POINTS_FILE)
   : new TelnetStreamer({
-      // host: process.env.ZEA_TELNET_HOST,
-      host: '192.168.1.9',
+      host: process.env.ZEA_TELNET_HOST,
+      // host: '192.168.1.3',
       // port: process.env.ZEA_TELNET_PORT,
       port: 1212,
     })
@@ -39,5 +39,5 @@ const sessionName = ZEA_SESSION_ID
 const session = new Session(sessionId, sessionName)
 
 const streamerDbBridge = new StreamerDbBridge(streamer, session)
-console.log('session started ') 
+console.log('session started ')
 await streamerDbBridge.start()

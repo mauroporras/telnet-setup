@@ -31,21 +31,21 @@ class TelnetStreamer extends BaseStreamer {
     socket.on('data', (data) => {
       const decoded = data.toString('utf8')
 
-      try {
-        if (fs.access(outPutText)) {
-          fs.appendFile(outPutText, data, (err) => {
-            if (err) throw err;
-          })
-        }
-        else{
-          fs.writeFile(outPutText, data, (err) => {
+      // try {
+      //   if (fs.access(outPutText)) {
+      //     fs.appendFile(outPutText, data, (err) => {
+      //       if (err) throw err;
+      //     })
+      //   }
+      //   else{
+      //     fs.writeFile(outPutText, data, (err) => {
             
-            if (err) throw err;
-          })
-        }
-      } catch(err) {
-        console.error(err)
-      }
+      //       if (err) throw err;
+      //     })
+      //   }
+      // } catch(err) {
+      //   console.error(err)
+      // }
 
       console.log(decoded)
       zeaDebug(decoded)
