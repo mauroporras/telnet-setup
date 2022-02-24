@@ -3,6 +3,9 @@ import { randomUUID } from 'crypto'
 import { db, serverTimestamp } from '../helpers/firebase.js'
 import { zeaDebug } from '../helpers/zeaDebug.js'
 
+// import {expressServer} from '../StreamBrowser.js'
+// import {streamBrowser} from '../../index.js'
+
 class Session {
   constructor(id, name) {
     if (!id) {
@@ -87,6 +90,9 @@ class Session {
       anchor: this.latestSelectedAnchor,
       string: point,
     }
+    // console.log(data)
+
+    // expressServer(data)
 
     const pointRef = db.collection(collectionId).doc(prointId)
     await pointRef.create(data)

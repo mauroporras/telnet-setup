@@ -5,6 +5,7 @@ import { zeaDebug } from './helpers/zeaDebug.js'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
+
 const outPutText =
   'C:/Box/Active Projects/190153_Cadet_Chapel_Repairs/Engineering/ZSK/ZSK_210712_SurveyLink/211004_MUBC/LogFiles/SurveyLog.txt'
 
@@ -49,7 +50,9 @@ class TelnetStreamer extends BaseStreamer {
 
       console.log(decoded)
       zeaDebug(decoded)
+
       this.emit('data', decoded)
+      
     })
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
@@ -93,6 +96,8 @@ class TelnetStreamer extends BaseStreamer {
       // } catch (err) {
       //   console.error(err)
       // }
+
+
 
       this.emit('data', decoded)
     })

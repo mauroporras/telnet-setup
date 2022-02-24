@@ -13,6 +13,7 @@ class StreamerDbBridge {
 
     this.streamer.on('data', (data) => {
       this.session.addPoint(data)
+      return data
     })
   }
 }

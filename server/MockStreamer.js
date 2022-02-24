@@ -28,22 +28,23 @@ class MockStreamer extends BaseStreamer {
 
       const data = arrayMockPoints[index]
 
-      try {
-        if (fs.access(outPutText)) {
-          fs.appendFile(outPutText, data, (err) => {
-            if (err) throw err;
-          })
-        }
-        else{
-          fs.writeFile(outPutText, data, (err) => {
+      //don't need this
+      // try {
+      //   if (fs.access(outPutText)) {
+      //     fs.appendFile(outPutText, data, (err) => {
+      //       if (err) throw err;
+      //     })
+      //   }
+      //   else{
+      //     fs.writeFile(outPutText, data, (err) => {
             
-            if (err) throw err;
-          })
-        }
-      } catch(err) {
-        console.error(err)
-      }
-
+      //       if (err) throw err;
+      //     })
+      //   }
+      // } catch(err) {
+      //   console.error(err)
+      // }
+      console.log(data)
       data && this.emit('data', data)
     })
   }
