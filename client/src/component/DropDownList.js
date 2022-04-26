@@ -25,7 +25,7 @@ export default function BasicSelect({setIpValue}) {
             label="IP Address"
             onChange={handleChange}
             >
-            <MenuItem value={'192.168.1.0'}>192.168.1.0</MenuItem>
+            <MenuItem value={'192.168.1.0'}>192.168.76.127</MenuItem>
             <MenuItem value={'192.168.1.1'}>192.168.1.1</MenuItem>
             <MenuItem value={'192.168.1.2'}>192.168.1.2</MenuItem>
             <MenuItem value={'192.168.1.3'}>192.168.1.3</MenuItem>

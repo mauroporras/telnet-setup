@@ -1,4 +1,5 @@
-import { randomUUID } from 'crypto'
+import  randomUUID  from 'crypto'
+//import { randomUUID } from 'crypto-random-string.js'
 
 import { db, serverTimestamp } from '../helpers/firebase.js'
 import { zeaDebug } from '../helpers/zeaDebug.js'
@@ -103,7 +104,7 @@ class Session {
       this.latestSelectedAnchor
     )
 
-    console.log("anchor selected", this.latestSelectedAnchor)
+    //console.log("anchor selected", this.latestSelectedAnchor)
 
     return prointId
   }

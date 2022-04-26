@@ -15,7 +15,7 @@ class TelnetStreamer extends BaseStreamer {
 
     this.params = params
 
-    this.#bootstrapTelnetClient()
+    this.bootstrapTelnetClient()
   }
 
   async connect() {
@@ -73,7 +73,7 @@ class TelnetStreamer extends BaseStreamer {
     return this.telnet.send(data)
   }
 
-  #bootstrapTelnetClient() {
+  bootstrapTelnetClient() {
     this.telnet = new Telnet()
 
     this.telnet.on('connect', () => {

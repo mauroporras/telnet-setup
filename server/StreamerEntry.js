@@ -12,7 +12,7 @@ const  StreamerEntry = async (ip, sessID) => {
   // const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE || 'mock'
   // const ZEA_SESSION_ID = process.env.ZEA_SESSION_ID || 'test'
   // const ZEA_STREAMER_TYPE = 'telnet' 
-  const ZEA_STREAMER_TYPE = 'mock' 
+  const ZEA_STREAMER_TYPE = 'telnet' 
   const ZEA_SESSION_ID = sessID || 'test'
 
   // console.log(
@@ -27,8 +27,7 @@ const  StreamerEntry = async (ip, sessID) => {
   const shouldUseMock = ZEA_STREAMER_TYPE === 'mock' ? true : false
   // console.log('status ', shouldUseMock)
 
-  const ZEA_TEST_POINTS_FILE =
-    'C:/Box/R&D Services/Restricted/04_Research Trajectories/BROWER SRVY REVIEW/SURVEYLINK_MVP/Mockup/Setup Survey Points.txt'
+  const ZEA_TEST_POINTS_FILE = '/home/pi/git/telnet-setup/Setup Survey Points.txt'
 
   const streamer = shouldUseMock
     ? // ? new MockStreamer(process.env.ZEA_TEST_POINTS_FILE)

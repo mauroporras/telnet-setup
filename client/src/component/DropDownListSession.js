@@ -25,8 +25,8 @@ export default function BasicSelect({setIDValue}) {
             label="Age"
             onChange={handleChange}
             >
-            <MenuItem value={'PMU'}>PMU</MenuItem>
-            <MenuItem value={'PMU2'}>PMU2</MenuItem>
+            <MenuItem value={'Tom-Rebar'}>PMU</MenuItem>
+            <MenuItem value={'Tom-Rebar01'}>PMU2</MenuItem>
             </Select>
         </FormControl>
         </Box>
