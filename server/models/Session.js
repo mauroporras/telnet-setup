@@ -1,6 +1,6 @@
 import  randomUUID  from 'crypto'
 //import { randomUUID } from 'crypto-random-string.js'
-
+//const randomUUID = require('crypto-random-string')
 import { db, serverTimestamp } from '../helpers/firebase.js'
 import { zeaDebug } from '../helpers/zeaDebug.js'
 
@@ -82,7 +82,7 @@ class Session {
 
     const collectionId = 'points'
 
-    const prointId = randomUUID()
+    const prointId = await randomUUID()
 
     const data = {
       id: prointId,
