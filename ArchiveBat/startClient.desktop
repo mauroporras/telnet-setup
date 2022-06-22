@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=startClient script
+Comment=Starts an AS400 session
+Exec=/home/pi/git/telnet-setup/Z_LaunchClient.sh
+Terminal=true
+Type=Application
+StartupNotify=false
+Name[en_US]=startClient script

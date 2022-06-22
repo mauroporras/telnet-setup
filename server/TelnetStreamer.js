@@ -5,6 +5,18 @@ import { zeaDebug } from './helpers/zeaDebug.js'
 
 import { BaseStreamer } from './BaseStreamer.js'
 
+import find from 'local-devices'
+
+async function getIp() {
+  
+  const found =  await find()
+  
+  //return find().then(devices => {
+  console.log('looking for something inside', found)
+  //return devices})
+  return await found
+}
+
 
 const outPutText =
   'C:/Box/Active Projects/190153_Cadet_Chapel_Repairs/Engineering/ZSK/ZSK_210712_SurveyLink/211004_MUBC/LogFiles/SurveyLog.txt'
@@ -14,6 +26,7 @@ class TelnetStreamer extends BaseStreamer {
     super()
 
     this.params = params
+    this.ipAddress = ''
 
     this.bootstrapTelnetClient()
   }
@@ -23,30 +36,20 @@ class TelnetStreamer extends BaseStreamer {
       shellPrompt: '',
       ...this.params,
     }
+    
+    
 
     const socket = new net.Socket()
-
+    const foundIt = await getIp()
+    this.params.host = foundIt[0].ip //currently a little risky, grabs the first ip address.
+    
+    console.log('looking for something', foundIt.ip)
+    console.log('looking for something this.params.host', this.params.host)
     console.log('session streaming')
 
     socket.on('error', (err) => console.log(err))
     socket.on('data', (data) => {
       const decoded = data.toString('utf8')
-
-      // try {
-      //   if (fs.access(outPutText)) {
-      //     fs.appendFile(outPutText, data, (err) => {
-      //       if (err) throw err;
-      //     })
-      //   }
-      //   else{
-      //     fs.writeFile(outPutText, data, (err) => {
-            
-      //       if (err) throw err;
-      //     })
-      //   }
-      // } catch(err) {
-      //   console.error(err)
-      // }
 
       console.log(decoded)
       zeaDebug(decoded)
@@ -54,6 +57,8 @@ class TelnetStreamer extends BaseStreamer {
       this.emit('data', decoded)
       
     })
+    
+    
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
     })
@@ -82,22 +87,6 @@ class TelnetStreamer extends BaseStreamer {
 
     this.telnet.on('data', (data) => {
       const decoded = data.toString('utf8')
-
-      // try {
-      //   if (fs.access(outPutText)) {
-      //     fs.appendFile(outPutText, decoded, (err) => {
-      //       if (err) throw err
-      //     })
-      //   } else {
-      //     fs.writeFile(outPutText, decoded, (err) => {
-      //       if (err) throw err
-      //     })
-      //   }
-      // } catch (err) {
-      //   console.error(err)
-      // }
-
-
 
       this.emit('data', decoded)
     })

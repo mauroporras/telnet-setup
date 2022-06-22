@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 
-import DropDownList from './DropDownList.js';
+//import DropDownList from './DropDownList.js';
 import DropDownListSession from './DropDownListSession.js'
 import ButtonStart from './Button.js'
 // import OutPut from './Output.js'
@@ -17,7 +17,7 @@ const App = () => {
 
   // const [state, setState] = useState()
   const [buttonStatus, setButtonStatus] = useState(false)
-  const [ipValue, setIpValue] = useState('')
+  //const [ipValue, setIpValue] = useState('')
   const [iDValue, setIDValue] = useState('')
 
 
@@ -33,7 +33,7 @@ const App = () => {
 
   
     useEffect(() => {
-      console.log('useeffect', ipValue, iDValue)
+      //console.log('useeffect', ipValue, iDValue)
 
 
       if(buttonStatus){
@@ -43,7 +43,7 @@ const App = () => {
         'Accept': 'application/json' },
         body: JSON.stringify({ 
           title: 'start telnet streamer',
-          IPAddress: ipValue,
+          //IPAddress: ipValue,
           sessionID: iDValue,
          })
       };
@@ -55,7 +55,7 @@ const App = () => {
         setButtonStatus(false)
       }
 
-    }, [buttonStatus, ipValue, iDValue]);
+    }, [buttonStatus,  iDValue]);//ipValue,
 
 
     console.log(data)
@@ -97,9 +97,9 @@ const App = () => {
   return (
     <div className='ui container grid' style={{maxWidth: "450px"}}>
       <div className='ui row'>
-        <div className='column eight wide'>
+        {/*<div className='column eight wide'>
           <DropDownList setIpValue={setIpValue}/>
-        </div>
+        </div>*/}
         <div className='column eight wide' >
             {/* <div style={{marginTop: "5%"}}>
                 - IP Address

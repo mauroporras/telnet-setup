@@ -1,4 +1,5 @@
-import  randomUUID  from 'crypto'
+import  randomUUID  from 'crypto-random-string'
+//import  randomUUID  from 'crypto'
 //import { randomUUID } from 'crypto-random-string.js'
 //const randomUUID = require('crypto-random-string')
 import { db, serverTimestamp } from '../helpers/firebase.js'
@@ -82,31 +83,32 @@ class Session {
 
     const collectionId = 'points'
 
-    const prointId = await randomUUID()
+    const pointId = await randomUUID(36)
+    //console.log (pointId)
 
     const data = {
-      id: prointId,
+      id: pointId,
       createdAt: serverTimestamp(),
       sessionId: this.id,
       anchor: this.latestSelectedAnchor,
       string: point,
     }
-    // console.log(data)
+     //console.log(data)
 
     // expressServer(data)
 
-    const pointRef = db.collection(collectionId).doc(prointId)
+    const pointRef = db.collection(collectionId).doc(pointId)
     await pointRef.create(data)
 
     zeaDebug(
       "Created new point with id '%s' and anchor '%s'",
-      prointId,
+      pointId,
       this.latestSelectedAnchor
     )
 
     //console.log("anchor selected", this.latestSelectedAnchor)
 
-    return prointId
+    return pointId
   }
 }
 

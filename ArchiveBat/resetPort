@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=resetPort
+Comment=Starts an AS400 session
+Exec=/home/pi/git/telnet-setup/Z_clear.sh
+Terminal=true
+Type=Application
+StartupNotify=false
+Name[en_US]=resetPort.desktop
+X-KeepTerminal=true
