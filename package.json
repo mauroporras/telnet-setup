@@ -15,5 +15,8 @@
     "debug": "yarn run nodemon --experimental-json-modules --inspect=0.0.0.0 index.js",
     "dev": "yarn run nodemon --experimental-json-modules index.js"
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=16"
+  }
 }
