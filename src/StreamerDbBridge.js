@@ -1,5 +1,3 @@
-import { zeaDebug } from './helpers/zeaDebug.js'
-
 class StreamerDbBridge {
   constructor(streamer, session) {
     this.streamer = streamer
@@ -8,6 +6,7 @@ class StreamerDbBridge {
 
   async start() {
     await this.streamer.connect()
+    await this.session.init()
 
     //const res = await this.streamer.send('uptime')
 

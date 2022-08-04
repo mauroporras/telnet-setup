@@ -13,7 +13,6 @@ export ZEA_TELNET_HOST=127.0.0.1
 export ZEA_TELNET_PORT=23
 
 export ZEA_SESSION_ID=testSelect
-export ZEA_SESSION_NAME=testSelect
 
 setup json key file from account setting
 ```
@@ -40,20 +39,4 @@ For telnet session with HTTP server:
 
 ```bash
 GET / HTTP/1.1
-```
-
-## Deploying Cloud Functions
-
-new install and linking functions to firebase project
-```bash
-firebase use --add
-firebase init functions
-```
-
-## Deploying Cloud Functions
-
-```bash
-cd functions
-export FIREBASE_PROJECT_ID=some-project-id
-yarn run deploy --project $FIREBASE_PROJECT_ID
 ```

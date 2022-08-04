@@ -3,4 +3,3 @@ node_modules/
 .envrc*
 *key.json
 yarn.lock
-functions/yarn.lock
