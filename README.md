@@ -13,7 +13,6 @@ export ZEA_TELNET_HOST=127.0.0.1
 export ZEA_TELNET_PORT=23
 
 export ZEA_SESSION_ID=testSelect
-export ZEA_SESSION_NAME=testSelect
 
 setup json key file from account setting
 ```
