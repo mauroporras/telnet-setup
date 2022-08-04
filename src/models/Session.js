@@ -10,7 +10,6 @@ class Session {
     }
 
     this.id = id
-    this.#latestSelectedAnchor = null
   }
 
   async init() {
