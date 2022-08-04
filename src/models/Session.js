@@ -2,13 +2,19 @@ import { db, serverTimestamp } from '../helpers/firebase.js'
 import { zeaDebug } from '../helpers/zeaDebug.js'
 
 class Session {
+  #latestSelectedAnchor
+
   constructor(id) {
     if (!id) {
       throw new Error('Missing `id` arg.')
     }
 
     this.id = id
-    this.latestSelectedAnchor = null
+    this.#latestSelectedAnchor = null
+  }
+
+  async init() {
+    await this.#observeSession()
   }
 
   async #observeSession() {
@@ -29,7 +35,8 @@ class Session {
 
     this.unsub = docRef.onSnapshot(
       (snapshot) => {
-        this.latestSelectedAnchor = snapshot.data().latestSelectedAnchor || null
+        this.#latestSelectedAnchor =
+          snapshot.data().latestSelectedAnchor || null
       },
       (error) => {
         console.log(`Encountered error: ${error}`)
@@ -38,8 +45,12 @@ class Session {
   }
 
   async addPoint(point) {
-    if (!this.latestSelectedAnchor) {
-      await this.#observeSession()
+    if (!this.#latestSelectedAnchor) {
+      console.warn(
+        "There's no #latestSelectedAnchor. Did you remember to #init the session?"
+      )
+
+      return
     }
 
     const docRef = db.collection('points').doc()
@@ -49,7 +60,7 @@ class Session {
       id,
       createdAt: serverTimestamp(),
       sessionId: this.id,
-      anchor: this.latestSelectedAnchor,
+      anchor: this.#latestSelectedAnchor,
       string: point,
     }
 
@@ -58,7 +69,7 @@ class Session {
     zeaDebug(
       "Created new point with id '%s' and anchor '%s'",
       id,
-      this.latestSelectedAnchor
+      this.#latestSelectedAnchor
     )
 
     return id
