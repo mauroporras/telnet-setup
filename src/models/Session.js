@@ -24,7 +24,7 @@ class Session {
     zeaDebug("Found existing session with id '%s'", this.id)
 
     if (this.unsub) {
-      this.unsub
+      this.unsub()
     }
 
     this.unsub = docRef.onSnapshot(
