@@ -33,10 +33,8 @@ const streamer = shouldUseMock
     })
 
 const sessionId = ZEA_SESSION_ID
-// const sessionName = process.env.ZEA_SESSION_NAME
-const sessionName = ZEA_SESSION_ID
 
-const session = new Session(sessionId, sessionName)
+const session = new Session(sessionId)
 
 const streamerDbBridge = new StreamerDbBridge(streamer, session)
 console.log('session started ')
