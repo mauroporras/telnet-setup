@@ -25,7 +25,7 @@ export default function BasicSelect({setIDValue}) {
             label="Age"
             onChange={handleChange}
             >
-            <MenuItem value={'sector-zone-6'}>sector-zone-6</MenuItem>
+            <MenuItem value={'0E5UDwaUXY5ukfyypq0Y&'}>office Test</MenuItem>
             <MenuItem value={'sector-zone-5_Shift'}>sector-zone-5_Shift</MenuItem>
             <MenuItem value={'Test'}>Test</MenuItem>
             </Select>

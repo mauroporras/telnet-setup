@@ -42,39 +42,3 @@ export const expressServer = (data) => {
 }
 
 
-// app.listen(PORT, () => {
-//   console.log(`Server listening on ${PORT}`);
-// });
-
-// import { BaseStreamer } from './BaseStreamer.js'
-
-// class StreamerBridge extends BaseStreamer{
-//   constructor(sessionName) {
-//     super()
-
-//     this.sessionName = sessionName
-//   }
-
-//   async sendReq(obj) {
-//     await this.sessionName.on('data', (data) => {
-//       obj.json({ message: data })
-//     })
-//   }
-
-//   async start(object) {
-//     await this.streamer.connect()
-
-//     //const res = await this.streamer.send('uptime')
-
-//     this.sessionName.on('data', (data) => {
-//       this.session.addPoint(data)
-//     })
-//   }
-// }
-
-// // const streamBrowser = (data) => {
-// //   console.log('streamBrowser')
-
-// // }
-
-// export { StreamerBridge }

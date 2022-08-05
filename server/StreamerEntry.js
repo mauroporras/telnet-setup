@@ -1,12 +1,16 @@
-
-
 import { MockStreamer } from './MockStreamer.js'
 import { TelnetStreamer } from './TelnetStreamer.js'
 import { StreamerDbBridge } from './StreamerDbBridge.js'
 
 import { Session } from './models/Session.js'
 
+// attempting to add messages
+  const utf8Encode = new TextEncoder()
 
+  const distanceCmd = '%R8Q,1:'
+  const startStreamCmd = '%R8Q,4:'
+  console.log('inside streamer entry %R8Q,4:', startStreamCmd)
+  var cmd =  utf8Encode.encode(startStreamCmd)
 
 const  StreamerEntry = async (ip, sessID) => {
   // const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE || 'mock'
@@ -52,7 +56,8 @@ const  StreamerEntry = async (ip, sessID) => {
   
   const dataReturned = await streamerDbBridge.start()
   console.log('dataReturned', dataReturned)
-
+  streamerDbBridge.send(cmd)
+  
   return dataReturned
 }
 

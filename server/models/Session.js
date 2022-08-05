@@ -75,6 +75,17 @@ class Session {
 
     this.unsubscribe()
   }
+  
+  async execute(cmd) {
+  // try to add a call after inital connection 
+    console.log('session', cmd)
+    //const result = await this.telnet.send(cmd)
+    //const result = await this.telnet.exec(cmd)
+    //console.log('streamer bridge result ', result)
+    //this.telnet.exec(cmd, (err, res) => {
+     // console.log(err, res)
+    //})
+  }
 
   async addPoint(point) {
     if (!this.doc) {
