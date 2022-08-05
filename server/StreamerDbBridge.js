@@ -1,4 +1,4 @@
-import { zeaDebug } from './helpers/zeaDebug.js'
+//import { zeaDebug } from './helpers/zeaDebug.js'
 
 // attempting to add messages
   /*const utf8Encode = new TextEncoder()
@@ -16,6 +16,7 @@ class StreamerDbBridge {
 
   async start() {
     await this.streamer.connect()
+    await this.session.init()
     
     //const res = await this.streamer.send('uptime')
     //const res = await this.streamer.send('uptime')

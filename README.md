@@ -42,7 +42,7 @@ For telnet session with HTTP server:
 GET / HTTP/1.1
 ```
 
-## Deploying Cloud Functions
+## Deploying Cloud Functions (not implemented)
 
 new install and linking functions to firebase project
 ```bash

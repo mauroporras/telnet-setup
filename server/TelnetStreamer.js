@@ -79,7 +79,7 @@ class TelnetStreamer extends BaseStreamer {
       console.log(ready)
       zeaDebug(ready)
 
-      this.emit('ready', cmd2)
+      //this.emit('ready', cmd2)
       
     })
     

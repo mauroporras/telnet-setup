@@ -17,6 +17,9 @@
     "debug": "yarn run nodemon --experimental-json-modules --inspect=0.0.0.0 index.js",
     "dev": "yarn run nodemon --experimental-json-modules index.js"
   },
-  "proxy": "http://localhost:3000",
-  "type": "module"
+  "proxy": "http://localhost:3006",
+  "type": "module",
+  "engines": {
+    "node": ">=16"
+  }
 }

@@ -26,8 +26,10 @@ export default function BasicSelect({setIDValue}) {
             onChange={handleChange}
             >
             <MenuItem value={'0E5UDwaUXY5ukfyypq0Y&'}>office Test</MenuItem>
-            <MenuItem value={'sector-zone-5_Shift'}>sector-zone-5_Shift</MenuItem>
-            <MenuItem value={'Test'}>Test</MenuItem>
+            <MenuItem value={'hZP48eRxk59Aq23rNZxM'}>360_Anchor_01</MenuItem>
+            <MenuItem value={'7uigFwbdNB4yv8NBV3fd'}>360_Anchor_02</MenuItem>
+            <MenuItem value={'v8JxQSif9fWgVVdEcjOx'}>360_Mullion_00</MenuItem>
+            <MenuItem value={'ssv2CvAkVgRwkvSy9su2'}>360_Mullion_02</MenuItem>
             </Select>
         </FormControl>
         </Box>

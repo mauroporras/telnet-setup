@@ -95,7 +95,7 @@ const App = () => {
 
 
   return (
-    <div className='ui container grid' style={{maxWidth: "450px"}}>
+    <div className='ui container grid' style={{maxWidth: "320px"}}>
       <div className='ui row'>
         {/*<div className='column eight wide'>
           <DropDownList setIpValue={setIpValue}/>
