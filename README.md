@@ -2,6 +2,8 @@
 
 ```bash
 yarn install
+
+cd into .\client\ yarn install
 ```
 
 ## Setting env vars
@@ -16,6 +18,9 @@ export ZEA_SESSION_ID=testSelect
 export ZEA_SESSION_NAME=testSelect
 
 setup json key file from account setting
+adjust in .\client package.json the start command 
+linux: "start": "PORT=3006 react-scripts start",
+windows: "start": "set PORT=3006 react-scripts start",
 ```
 
 Optional:
