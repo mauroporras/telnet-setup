@@ -7,6 +7,8 @@
   const startStreamCmd = '%R8Q,4:'
   console.log('%R8Q,4:', startStreamCmd)
   var cmd2 =  utf8Encode.encode(distanceCmd)*/
+  
+  //Add bump
 
 class StreamerDbBridge {
   constructor(streamer, session) {
