@@ -8,6 +8,8 @@ import { BaseStreamer } from './BaseStreamer.js'
 
 import find from 'local-devices'
 
+let LuigiMac = ["00:17:17:06:8a:a5"]
+
 async function getIp() {
   
   //find().then(devices => { console.log('found the IP in the promise', devices)
@@ -40,6 +42,7 @@ class TelnetStreamer extends BaseStreamer {
     this.ipAddress = ''
 
     this.bootstrapTelnetClient()
+    // this.#bootstrapTelnetClient()
   }
 
   async connect() {
@@ -53,8 +56,24 @@ class TelnetStreamer extends BaseStreamer {
     const socket = new net.Socket()
     
     const foundIt = await getIp()
+   
+
+
+
+
     try {
-      this.params.host = foundIt[0].ip //currently a little risky, grabs the first ip address.
+      
+      var ipToReturn
+      foundIt.forEach(each => {
+        if(each.mac.includes(LuigiMac) ) {
+          console.log('LuigiMac', each.ip)
+          ipToReturn = each.ip
+        }
+      })
+      console.log('TSIP', ipToReturn)
+
+      // this.params.host = foundIt[0].ip //currently a little risky, grabs the first ip address.
+      this.params.host = ipToReturn 
     } catch {
       console.log('IP not found, try again')
     }
@@ -123,6 +142,7 @@ class TelnetStreamer extends BaseStreamer {
   
 
   bootstrapTelnetClient() {
+  // #bootstrapTelnetClient() {
     this.telnet = new Telnet()
 
     this.telnet.on('connect', () => {

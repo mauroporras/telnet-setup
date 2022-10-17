@@ -20,7 +20,12 @@ export ZEA_SESSION_NAME=testSelect
 setup json key file from account setting
 adjust in .\client package.json the start command 
 linux: "start": "PORT=3006 react-scripts start",
-windows: "start": "set PORT=3006 react-scripts start",
+windows: "start": "set PORT=3006 && react-scripts start",
+
+adjust in ./server/TelnetStreamer.js
+
+line 18: this.#bootstrapTelnetClient()
+line 76: #bootstrapTelnetClient() {
 ```
 
 Optional:
