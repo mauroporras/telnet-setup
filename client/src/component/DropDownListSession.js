@@ -25,11 +25,9 @@ export default function BasicSelect({setIDValue}) {
             label="Age"
             onChange={handleChange}
             >
-            <MenuItem value={'0E5UDwaUXY5ukfyypq0Y&'}>office Test</MenuItem>
-            <MenuItem value={'hZP48eRxk59Aq23rNZxM'}>360_Anchor_01</MenuItem>
-            <MenuItem value={'7uigFwbdNB4yv8NBV3fd'}>360_Anchor_02</MenuItem>
-            <MenuItem value={'v8JxQSif9fWgVVdEcjOx'}>360_Mullion_00</MenuItem>
-            <MenuItem value={'ssv2CvAkVgRwkvSy9su2'}>360_Mullion_02</MenuItem>
+            <MenuItem value={'vpxKZrMTKCttoVH5CfOR'}>office Test</MenuItem>
+            <MenuItem value={'yap9Q9NxuGGRQ1NB7ieT'}>CCR AMU_01</MenuItem>
+            <MenuItem value={'M1lcgpV5C314QilPeLNB'}>CCR AMU_02</MenuItem>
             </Select>
         </FormControl>
         </Box>
