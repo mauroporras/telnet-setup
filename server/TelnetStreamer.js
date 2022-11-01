@@ -12,8 +12,22 @@ let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac']
 
 async function getIp() {
   //find().then(devices => { console.log('found the IP in the promise', devices)
+  i = 0
+  notFound = true
+  var found
 
-  const found = await find()
+  while (notFound){
+    found = await find()
+    console.log('what did we find', i, found)
+
+    if (i < 5 || found.length < 1) i++
+    else notFound = false
+
+    
+  }
+  // const found1 = await find()
+  // console.log('see whats around', found)
+  // const found = await find({ address: '192.168.1.0-192.168.1.25' })
 
   //return find().then(devices => {
   console.log('looking for something inside', found)
