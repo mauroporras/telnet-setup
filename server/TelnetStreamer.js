@@ -8,7 +8,7 @@ import { BaseStreamer } from './BaseStreamer.js'
 
 import find from 'local-devices'
 
-let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac']
+let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac', '00:17:17:03:82:76']
 
 async function getIp() {
   //find().then(devices => { console.log('found the IP in the promise', devices)
@@ -18,7 +18,8 @@ async function getIp() {
 
   while (notFound){
     found = await find()
-    console.log('what did we find', i, found)
+    console.log('what did we find', i, found.length, found)
+
 
     if (i < 5 || found.length < 1) i++
     else notFound = false
@@ -70,7 +71,7 @@ class TelnetStreamer extends BaseStreamer {
       var ipToReturn
       foundIt.forEach((each) => {
         console.log(LuigiMac[1], each.mac)
-        if (each.mac.includes(LuigiMac[0]) || each.mac.includes(LuigiMac[1])) {
+        if (each.mac.includes(LuigiMac[0]) || each.mac.includes(LuigiMac[1]) || each.mac.includes(LuigiMac[2])) {
           console.log('LuigiMac', each.ip)
           ipToReturn = each.ip
         }
