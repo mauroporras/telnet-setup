@@ -23,13 +23,10 @@ const ZEA_TEST_POINTS_FILE =
   'C:/Box/R&D Services/Restricted/04_Research Trajectories/BROWER SRVY REVIEW/SURVEYLINK_MVP/Mockup/Setup Survey Points.txt'
 
 const streamer = shouldUseMock
-  ? // ? new MockStreamer(process.env.ZEA_TEST_POINTS_FILE)
-    new MockStreamer(ZEA_TEST_POINTS_FILE)
+  ? new MockStreamer(ZEA_TEST_POINTS_FILE)
   : new TelnetStreamer({
       host: process.env.ZEA_TELNET_HOST,
-      // host: '192.168.1.3',
-      // port: process.env.ZEA_TELNET_PORT,
-      port: 1212,
+      port: process.env.ZEA_TELNET_PORT,
     })
 
 const sessionId = ZEA_SESSION_ID
