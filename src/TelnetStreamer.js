@@ -39,7 +39,6 @@ class TelnetStreamer extends BaseStreamer {
       //   }
       //   else{
       //     fs.writeFile(outPutText, data, (err) => {
-            
       //       if (err) throw err;
       //     })
       //   }
@@ -54,8 +53,6 @@ class TelnetStreamer extends BaseStreamer {
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
     })
-
-    return
 
     zeaDebug('TelnetStreamer params:\n%O', params)
 
