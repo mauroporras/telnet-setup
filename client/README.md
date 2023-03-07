@@ -68,3 +68,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+web pack 5 missing issue when i added firebase. folowed the outline on this site https://alchemy.com/blog/how-to-polyfill-node-core-modules-in-webpack-5
+
+yarn add path-browserify browserify-zlib constants-browserify

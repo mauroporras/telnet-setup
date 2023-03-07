@@ -18,7 +18,8 @@ const App = () => {
   // const [state, setState] = useState()
   const [buttonStatus, setButtonStatus] = useState(false)
   //const [ipValue, setIpValue] = useState('')
-  const [iDValue, setIDValue] = useState('')
+  const [sessioniDValue, setSessionIDValue] = useState('')
+  const [stationiDValue, setStationIDValue] = useState('')
 
 
   const [data, setData] = useState(null);
@@ -44,7 +45,8 @@ const App = () => {
         body: JSON.stringify({ 
           title: 'start telnet streamer',
           //IPAddress: ipValue,
-          sessionID: iDValue,
+          sessionID: sessioniDValue,
+          stationID: stationiDValue,
          })
       };
   
@@ -55,7 +57,7 @@ const App = () => {
         setButtonStatus(false)
       }
 
-    }, [buttonStatus,  iDValue]);//ipValue,
+    }, [buttonStatus,  sessioniDValue, stationiDValue]);//ipValue,
 
 
     console.log(data)
@@ -109,7 +111,7 @@ const App = () => {
       </div>
       <div className='ui row'>
         <div className='column eight wide'>
-          <DropDownListSession setIDValue={setIDValue}/>
+          <DropDownListSession setSessionIDValue={setSessionIDValue} setStationIDValue={setStationIDValue}/>
         </div>
         <div className='column eight wide' >
             {/* <div style={{marginTop: "5%"}}>

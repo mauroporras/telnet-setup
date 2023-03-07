@@ -70,7 +70,7 @@ class TelnetStreamer extends BaseStreamer {
     try {
       var ipToReturn
       foundIt.forEach((each) => {
-        console.log(LuigiMac[1], each.mac)
+        console.log('LuigiMac', each.mac)
         if (each.mac.includes(LuigiMac[0]) || each.mac.includes(LuigiMac[1]) || each.mac.includes(LuigiMac[2])) {
           console.log('LuigiMac', each.ip)
           ipToReturn = each.ip
