@@ -31,8 +31,10 @@ const streamer = shouldUseMock
 
 const sessionId = ZEA_SESSION_ID
 
-const session = new Session(sessionId)
+const dbSession = new Session(sessionId)
+const collabSession = new zea-collab.Session()
+collabSession.joinRoom(sessionId)
 
-const streamerDbBridge = new StreamerDbBridge(streamer, session)
+const streamerDbBridge = new StreamerDbBridge(streamer, dbSession, collabSession)
 console.log('session started ')
 await streamerDbBridge.start()

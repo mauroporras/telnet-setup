@@ -46,6 +46,9 @@ class TelnetStreamer extends BaseStreamer {
       //   console.error(err)
       // }
 
+      // Check for a command coming in from an operator.
+      // 
+
       console.log(decoded)
       zeaDebug(decoded)
       this.emit('data', decoded)
