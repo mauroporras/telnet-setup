@@ -43,8 +43,8 @@ class Session {
     )
   }
 
-  async addPoint(point) {
-    if (!this.#latestSelectedAnchor) {
+  async addPoint(point, anchor) {
+    if (!anchor) {
       console.warn(
         "There's no #latestSelectedAnchor. Did you remember to #init the session?"
       )
@@ -59,7 +59,7 @@ class Session {
       id,
       createdAt: serverTimestamp(),
       sessionId: this.id,
-      anchor: this.#latestSelectedAnchor,
+      anchor: anchor,
       string: point,
     }
 
@@ -68,7 +68,7 @@ class Session {
     zeaDebug(
       "Created new point with id '%s' and anchor '%s'",
       id,
-      this.#latestSelectedAnchor
+      anchor
     )
 
     return id
