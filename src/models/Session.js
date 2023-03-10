@@ -16,33 +16,6 @@ class Session {
     await this.#observeSession()
   }
 
-  async #observeSession() {
-    const docRef = db.collection('sessions').doc(this.id)
-    const doc = await docRef.get()
-
-    if (!doc.exists) {
-      throw new Error(
-        `Session not found. Id: "${this.id}". Sessions must be created using the web app.`
-      )
-    }
-
-    zeaDebug("Found existing session with id '%s'", this.id)
-
-    if (this.unsub) {
-      this.unsub()
-    }
-
-    this.unsub = docRef.onSnapshot(
-      (snapshot) => {
-        this.#latestSelectedAnchor =
-          snapshot.data().latestSelectedAnchor || null
-      },
-      (error) => {
-        console.log(`Encountered error: ${error}`)
-      }
-    )
-  }
-
   async addPoint(point) {
     if (!this.#latestSelectedAnchor) {
       console.warn(
@@ -72,6 +45,51 @@ class Session {
     )
 
     return id
+  }
+
+  onCommandCreated(callback) {
+    const query = db
+      .collection('commands')
+      .where('sessionId', '==', this.id)
+      .where('isInvoked', '==', false)
+      .orderBy('createdAt')
+
+    const unsub = query.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          callback(change.doc.data())
+        }
+      })
+    })
+
+    return unsub
+  }
+
+  async #observeSession() {
+    const docRef = db.collection('sessions').doc(this.id)
+    const doc = await docRef.get()
+
+    if (!doc.exists) {
+      throw new Error(
+        `Session not found. Id: "${this.id}". Sessions must be created using the web app.`
+      )
+    }
+
+    zeaDebug("Found existing session with id '%s'", this.id)
+
+    if (this.unsub) {
+      this.unsub()
+    }
+
+    this.unsub = docRef.onSnapshot(
+      (snapshot) => {
+        this.#latestSelectedAnchor =
+          snapshot.data().latestSelectedAnchor || null
+      },
+      (error) => {
+        console.log(`Encountered error: ${error}`)
+      }
+    )
   }
 }
 
