@@ -34,5 +34,4 @@ const sessionId = ZEA_SESSION_ID
 const session = new Session(sessionId)
 
 const streamerDbBridge = new StreamerDbBridge(streamer, session)
-console.log('session started ')
 await streamerDbBridge.start()

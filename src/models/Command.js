@@ -25,7 +25,6 @@ class Command {
     return new Promise(async (resolve) => {
       let result
 
-      // Send the command to the total station.
       const { x, y, z } = this.data.position
       result = await this.streamer.send(`%R8Q,7:1,${x},${y},${z}\r\n`)
       result = await this.streamer.send('%R8Q,1:\r\n')

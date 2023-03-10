@@ -25,19 +25,21 @@ class TelnetStreamer extends BaseStreamer {
 
     const socket = new net.Socket()
 
-    console.log('session streaming')
-
     socket.on('error', (err) => console.log(err))
+
     socket.on('data', (data) => {
       const decoded = data.toString('utf8')
+
+      zeaDebug('Socket decoded data:', decoded)
+
+      this.emit('data', decoded)
 
       // try {
       //   if (fs.access(outPutText)) {
       //     fs.appendFile(outPutText, data, (err) => {
       //       if (err) throw err;
       //     })
-      //   }
-      //   else{
+      //   } else {
       //     fs.writeFile(outPutText, data, (err) => {
       //       if (err) throw err;
       //     })
@@ -45,11 +47,8 @@ class TelnetStreamer extends BaseStreamer {
       // } catch(err) {
       //   console.error(err)
       // }
-
-      console.log(decoded)
-      zeaDebug(decoded)
-      this.emit('data', decoded)
     })
+
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
     })
@@ -71,10 +70,12 @@ class TelnetStreamer extends BaseStreamer {
     this.telnet = new Telnet()
 
     this.telnet.on('connect', () => {
-      zeaDebug('Connected.')
+      zeaDebug('Telnet connected.')
     })
 
     this.telnet.on('data', (data) => {
+      zeaDebug('Telnet data:', data)
+
       const decoded = data.toString('utf8')
 
       // try {
@@ -95,31 +96,31 @@ class TelnetStreamer extends BaseStreamer {
     })
 
     this.telnet.on('ready', () => {
-      zeaDebug('Ready.')
+      zeaDebug('Telnet ready.')
     })
 
     this.telnet.on('writedone', () => {
-      zeaDebug('Writedone.')
+      zeaDebug('Telnet writedone.')
     })
 
     this.telnet.on('timeout', () => {
-      zeaDebug('Timeout.')
+      zeaDebug('Telnet timeout.')
     })
 
     this.telnet.on('failedlogin', () => {
-      zeaDebug('Failed login.')
+      zeaDebug('Telnet failed login.')
     })
 
     this.telnet.on('error', () => {
-      zeaDebug('Error.')
+      zeaDebug('Telnet error.')
     })
 
     this.telnet.on('end', () => {
-      zeaDebug('End.')
+      zeaDebug('Telnet end.')
     })
 
     this.telnet.on('close', () => {
-      zeaDebug('Close.')
+      zeaDebug('Telnet close.')
     })
   }
 }
