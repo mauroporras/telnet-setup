@@ -3,6 +3,7 @@ import path from 'path'
 import { interval } from 'rxjs'
 
 import { BaseStreamer } from './BaseStreamer.js'
+import { TotalStationErrors } from './models/Command.js'
 
 const outPutText = "C:/Box/Active Projects/190153_Cadet_Chapel_Repairs/Engineering/ZSK/ZSK_210712_SurveyLink/211004_MUBC/LogFiles/SurveyLog.txt"
 
@@ -31,16 +32,14 @@ class MockStreamer extends BaseStreamer {
       try {
         if (fs.access(outPutText)) {
           fs.appendFile(outPutText, data, (err) => {
-            if (err) throw err;
+            if (err) throw err
           })
-        }
-        else{
+        } else {
           fs.writeFile(outPutText, data, (err) => {
-            
-            if (err) throw err;
+            if (err) throw err
           })
         }
-      } catch(err) {
+      } catch (err) {
         console.error(err)
       }
 
@@ -49,7 +48,11 @@ class MockStreamer extends BaseStreamer {
   }
 
   async send(data) {
-    return 'SENT FROM MOCK'
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(TotalStationErrors.GRC_OK)
+      }, 1000)
+    })
   }
 }
 
