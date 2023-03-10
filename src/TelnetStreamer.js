@@ -59,7 +59,7 @@ class TelnetStreamer extends BaseStreamer {
     try {
       await this.telnet.connect(params)
     } catch (error) {
-      console.info(error)
+      console.error(error)
     }
   }
 
