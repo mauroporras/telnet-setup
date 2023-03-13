@@ -25,7 +25,9 @@ class TelnetStreamer extends BaseStreamer {
 
     const socket = new net.Socket()
 
-    socket.on('error', (err) => console.log(err))
+    this.socket = socket
+
+    socket.on('error', (err) => console.error('Socket error:', err))
 
     socket.on('data', (data) => {
       const decoded = data.toString('utf8')
@@ -55,15 +57,19 @@ class TelnetStreamer extends BaseStreamer {
 
     zeaDebug('TelnetStreamer params:\n%O', params)
 
+    /*
+    * The Telnet streamer doesn't seem to be doing anything.
     try {
       await this.telnet.connect(params)
     } catch (error) {
       console.error(error)
     }
+    */
   }
 
   async send(data) {
-    return this.telnet.send(data)
+    this.socket.write(data)
+    // return this.telnet.send(data)
   }
 
   #bootstrapTelnetClient() {

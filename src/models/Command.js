@@ -30,14 +30,14 @@ class Command {
   }
 
   async invoke() {
+    const { x, y, z } = this.data.position
+
+    this.streamer.send(TotalStationCommands.turnTelescope(x, y, z))
+    this.streamer.send(TotalStationCommands.START_STREAM)
+    this.streamer.send(TotalStationCommands.SAMPLE_DIST)
+    this.streamer.send(TotalStationCommands.SEARCH)
+
     return new Promise(async (resolve) => {
-      const { x, y, z } = this.data.position
-
-      this.streamer.send(TotalStationCommands.turnTelescope(x, y, z))
-      this.streamer.send(TotalStationCommands.START_STREAM)
-      this.streamer.send(TotalStationCommands.SAMPLE_DIST)
-      this.streamer.send(TotalStationCommands.SEARCH)
-
       const off = this.streamer.on('data', async (point) => {
         off()
 
