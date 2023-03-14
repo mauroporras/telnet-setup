@@ -41,13 +41,9 @@ class TelnetStreamer extends BaseStreamer {
       SURVEY_STREAMING_RESPONSE_PREFIX
     )
 
-    if (isStreamingResponse) {
-      this.emit('streaming-response', decoded)
+    const eventType = isStreamingResponse ? 'streaming-response' : 'point'
 
-      return
-    }
-
-    throw new Error(`Unhandled data: ${decoded}`)
+    this.emit(eventType, decoded)
   }
 }
 
