@@ -16,14 +16,16 @@ class Session {
     await this.#observeSession()
   }
 
-  async addPoint(point) {
-    if (!this.#latestSelectedAnchor) {
+  async addPoint(point, anchor) {
+    if (!anchor && !this.#latestSelectedAnchor) {
       console.warn(
-        "There's no #latestSelectedAnchor. Did you remember to #init the session?"
+        'Missing `anchor` and `latestSelectedAnchor`. Did you remember to #init the session?'
       )
 
       return
     }
+
+    const theAnchor = anchor || this.#latestSelectedAnchor
 
     const docRef = db.collection('points').doc()
     const { id } = docRef
@@ -32,17 +34,13 @@ class Session {
       id,
       createdAt: serverTimestamp(),
       sessionId: this.id,
-      anchor: this.#latestSelectedAnchor,
+      anchor: theAnchor,
       string: point,
     }
 
     await docRef.set(data)
 
-    zeaDebug(
-      "Created new point with id '%s' and anchor '%s'",
-      id,
-      this.#latestSelectedAnchor
-    )
+    zeaDebug("Created new point with id '%s' and anchor '%s'", id, theAnchor)
 
     return id
   }

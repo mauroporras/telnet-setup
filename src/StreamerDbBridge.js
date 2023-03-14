@@ -12,15 +12,13 @@ class StreamerDbBridge {
     await this.streamer.connect()
     await this.session.init()
 
-    //const res = await this.streamer.send('uptime')
-
     this.session.onCommandCreated((data) => {
       const command = new Command(this.streamer, this.session, data)
       this.commandQueue.addCommand(command)
     })
 
-    this.streamer.on('data', (data) => {
-      this.session.addPoint(data)
+    this.streamer.on('point', (point) => {
+      this.session.addPoint(point)
     })
   }
 }

@@ -40,28 +40,25 @@ class Command {
     this.streamer.send(TotalStationCommands.SAMPLE_DIST)
     this.streamer.send(TotalStationCommands.SEARCH)
 
-    return new Promise(async (resolve) => {
-      this.streamer.on('streaming-response', async (response) => {
-        const responseCode = response.substring(response.lastIndexOf(':') + 1)
+    this.streamer.on('streaming-response', async (response) => {
+      const responseCode = response.substring(response.lastIndexOf(':') + 1)
 
-        if (responseCode !== '0') {
-          if (responseCode === '51') {
-            this.streamer.send(TotalStationCommands.STOP_STREAM)
+      if (responseCode !== '0') {
+        if (responseCode === '51') {
+          this.streamer.send(TotalStationCommands.STOP_STREAM)
 
-            return
-          }
-
-          throw new Error(TotalStationResponses[responseCode])
+          return
         }
-      })
 
+        throw new Error(TotalStationResponses[responseCode])
+      }
+    })
+
+    return new Promise(async (resolve) => {
       this.streamer.on('point', async (point) => {
         this.streamer.send(TotalStationCommands.STOP_STREAM)
 
         await this.#markAsInvoked()
-
-        // A point looks like this:
-        // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
 
         await this.session.addPoint(point, this.data.anchor)
 
