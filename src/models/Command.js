@@ -42,6 +42,17 @@ class Command {
 
     return new Promise(async (resolve) => {
       this.streamer.once('streaming-response', async (response) => {
+        const responseCode = response.substring(response.lastIndexOf(':') + 1)
+
+        if (responseCode !== '0') {
+          if (responseCode === '51') {
+            this.streamer.send(TotalStationCommands.STOP_STREAM)
+
+            return
+          }
+
+          throw new Error(TotalStationResponses[responseCode])
+        }
 
         this.streamer.send(TotalStationCommands.STOP_STREAM)
 
@@ -62,4 +73,4 @@ class Command {
   }
 }
 
-export { Command, TotalStationResponses }
+export { Command }

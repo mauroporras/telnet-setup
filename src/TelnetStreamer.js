@@ -1,7 +1,6 @@
 import net from 'net'
 import { zeaDebug } from './helpers/zeaDebug.js'
 import { BaseStreamer } from './BaseStreamer.js'
-import { TotalStationResponses } from './models/Command.js'
 
 const SURVEY_STREAMING_RESPONSE_PREFIX = '%R8P'
 
@@ -27,7 +26,7 @@ class TelnetStreamer extends BaseStreamer {
     })
   }
 
-  async send(data) {
+  send(data) {
     this.socket.write(data)
 
     zeaDebug('Sent:', data)
@@ -43,12 +42,6 @@ class TelnetStreamer extends BaseStreamer {
     )
 
     if (isStreamingResponse) {
-      const responseCode = decoded.substring(decoded.lastIndexOf(':') + 1)
-
-      if (responseCode !== '0') {
-        throw new Error(TotalStationResponses[responseCode])
-      }
-
       this.emit('streaming-response', decoded)
 
       return
