@@ -11,15 +11,16 @@ const TotalStationCommands = {
 const TotalStationErrors = {
   GRC_OK: 0,
   // GRC_NOT_OK:40,
-  GRC_PositioningFailed: 41,
+  GRC_POSITIONING_FAILED: 41,
 
   GRC_DIST_ERR: 26,
 
   // GRC_NOT_OK: 30,
-  GRC_ReflectorNotFound: 31,
+  GRC_REFLECTOR_NOT_FOUND: 31,
 
   GRC_START_FAILED: 50,
-  GRC_STREAM_ACITVE: 51,
+  GRC_STREAM_ACTIVE: 51,
+  GRC_STREAM_NOT_ACTIVE: 53,
 }
 
 class Command {
@@ -38,13 +39,13 @@ class Command {
     this.streamer.send(TotalStationCommands.SEARCH)
 
     return new Promise(async (resolve) => {
-      const off = this.streamer.on('data', async (point) => {
-        off()
+      this.streamer.once('streaming-response', async (response) => {
 
         this.streamer.send(TotalStationCommands.STOP_STREAM)
 
         await this.#markAsInvoked()
 
+        // A point looks like this:
         // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
         await this.session.addPoint(point, this.data.anchor)
 

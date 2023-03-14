@@ -1,133 +1,53 @@
 import net from 'net'
-import Telnet from 'telnet-client'
-
 import { zeaDebug } from './helpers/zeaDebug.js'
-
 import { BaseStreamer } from './BaseStreamer.js'
 
-const outPutText =
-  'C:/Box/Active Projects/190153_Cadet_Chapel_Repairs/Engineering/ZSK/ZSK_210712_SurveyLink/211004_MUBC/LogFiles/SurveyLog.txt'
+const SURVEY_STREAMING_RESPONSE_PREFIX = '%R8P'
 
 class TelnetStreamer extends BaseStreamer {
-  constructor(params) {
+  constructor(host, port) {
     super()
 
-    this.params = params
-
-    this.#bootstrapTelnetClient()
+    this.host = host
+    this.port = port
   }
 
   async connect() {
-    const params = {
-      shellPrompt: '',
-      ...this.params,
-    }
-
     const socket = new net.Socket()
 
     this.socket = socket
 
     socket.on('error', (err) => console.error('Socket error:', err))
 
-    socket.on('data', (data) => {
-      const decoded = data.toString('utf8')
+    socket.on('data', this.#handleData.bind(this))
 
-      zeaDebug('Socket decoded data:', decoded)
-
-      this.emit('data', decoded)
-
-      // try {
-      //   if (fs.access(outPutText)) {
-      //     fs.appendFile(outPutText, data, (err) => {
-      //       if (err) throw err;
-      //     })
-      //   } else {
-      //     fs.writeFile(outPutText, data, (err) => {
-      //       if (err) throw err;
-      //     })
-      //   }
-      // } catch(err) {
-      //   console.error(err)
-      // }
-    })
-
-    socket.connect(this.params.port, this.params.host, () => {
+    socket.connect(this.port, this.host, () => {
       socket.write('%1POWR 1 ')
     })
-
-    zeaDebug('TelnetStreamer params:\n%O', params)
-
-    /*
-    * The Telnet streamer doesn't seem to be doing anything.
-    try {
-      await this.telnet.connect(params)
-    } catch (error) {
-      console.error(error)
-    }
-    */
   }
 
   async send(data) {
+    zeaDebug('Will send:', data)
+
     this.socket.write(data)
-    // return this.telnet.send(data)
   }
 
-  #bootstrapTelnetClient() {
-    this.telnet = new Telnet()
+  #handleData(data) {
+    const decoded = data.toString('utf8')
 
-    this.telnet.on('connect', () => {
-      zeaDebug('Telnet connected.')
-    })
+    zeaDebug('Socket decoded data:', decoded)
 
-    this.telnet.on('data', (data) => {
-      zeaDebug('Telnet data:', data)
+    const isStreamingResponse = decoded.startsWith(
+      SURVEY_STREAMING_RESPONSE_PREFIX
+    )
 
-      const decoded = data.toString('utf8')
+    if (isStreamingResponse) {
+      this.emit('streaming-response', decoded)
 
-      // try {
-      //   if (fs.access(outPutText)) {
-      //     fs.appendFile(outPutText, decoded, (err) => {
-      //       if (err) throw err
-      //     })
-      //   } else {
-      //     fs.writeFile(outPutText, decoded, (err) => {
-      //       if (err) throw err
-      //     })
-      //   }
-      // } catch (err) {
-      //   console.error(err)
-      // }
+      return
+    }
 
-      this.emit('data', decoded)
-    })
-
-    this.telnet.on('ready', () => {
-      zeaDebug('Telnet ready.')
-    })
-
-    this.telnet.on('writedone', () => {
-      zeaDebug('Telnet writedone.')
-    })
-
-    this.telnet.on('timeout', () => {
-      zeaDebug('Telnet timeout.')
-    })
-
-    this.telnet.on('failedlogin', () => {
-      zeaDebug('Telnet failed login.')
-    })
-
-    this.telnet.on('error', () => {
-      zeaDebug('Telnet error.')
-    })
-
-    this.telnet.on('end', () => {
-      zeaDebug('Telnet end.')
-    })
-
-    this.telnet.on('close', () => {
-      zeaDebug('Telnet close.')
-    })
+    throw new Error('Unhandled data:', decoded)
   }
 }
 

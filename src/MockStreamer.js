@@ -1,11 +1,8 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 import { interval } from 'rxjs'
-
+import { zeaDebug } from './helpers/zeaDebug.js'
 import { BaseStreamer } from './BaseStreamer.js'
-import { TotalStationErrors } from './models/Command.js'
-
-const outPutText = "C:/Box/Active Projects/190153_Cadet_Chapel_Repairs/Engineering/ZSK/ZSK_210712_SurveyLink/211004_MUBC/LogFiles/SurveyLog.txt"
 
 class MockStreamer extends BaseStreamer {
   constructor(mockPointsPath) {
@@ -15,6 +12,8 @@ class MockStreamer extends BaseStreamer {
   }
 
   async connect() {
+    zeaDebug('MockStreamer file path:', this.mockPointsPath)
+
     const mockPoints = await fs.readFile(
       path.resolve(this.mockPointsPath),
       'utf8'
@@ -29,30 +28,18 @@ class MockStreamer extends BaseStreamer {
 
       const data = arrayMockPoints[index]
 
-      try {
-        if (fs.access(outPutText)) {
-          fs.appendFile(outPutText, data, (err) => {
-            if (err) throw err
-          })
-        } else {
-          fs.writeFile(outPutText, data, (err) => {
-            if (err) throw err
-          })
-        }
-      } catch (err) {
-        console.error(err)
+      if (data) {
+        this.emit('data', data)
       }
-
-      data && this.emit('data', data)
     })
   }
 
   async send(data) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(TotalStationErrors.GRC_OK)
-      }, 1000)
-    })
+    zeaDebug('MockStreamer received data:', data)
+
+    setTimeout(() => {
+      this.emit('streaming-response', '%R8P,0,0:0')
+    }, 1000)
   }
 }
 

@@ -20,14 +20,11 @@ const shouldUseMock = ZEA_STREAMER_TYPE === 'mock' ? true : false
 // console.log('status ', shouldUseMock)
 
 const ZEA_TEST_POINTS_FILE =
-  'C:/Box/R&D Services/Restricted/04_Research Trajectories/BROWER SRVY REVIEW/SURVEYLINK_MVP/Mockup/Setup Survey Points.txt'
+  '/Users/maure/workspace/zahner/telnet-setup/assets/mock-points.txt'
 
 const streamer = shouldUseMock
   ? new MockStreamer(ZEA_TEST_POINTS_FILE)
-  : new TelnetStreamer({
-      host: process.env.ZEA_TELNET_HOST,
-      port: process.env.ZEA_TELNET_PORT,
-    })
+  : new TelnetStreamer(process.env.ZEA_TELNET_HOST, process.env.ZEA_TELNET_PORT)
 
 const sessionId = ZEA_SESSION_ID
 
