@@ -8,19 +8,21 @@ const TotalStationCommands = {
   STOP_STREAM: '%R8Q,5:\r\n',
 }
 
-const TotalStationErrors = {
-  GRC_OK: 0,
-  // GRC_NOT_OK:40,
-  GRC_POSITIONING_FAILED: 41,
+const TotalStationResponses = {
+  0: 'GRC_OK',
+  // 40: 'GRC_NOT_OK',
+  41: 'GRC_POSITIONING_FAILED',
 
-  GRC_DIST_ERR: 26,
+  26: 'GRC_DIST_ERR',
 
-  // GRC_NOT_OK: 30,
-  GRC_REFLECTOR_NOT_FOUND: 31,
+  // 30: 'GRC_NOT_OK',
+  31: 'GRC_REFLECTOR_NOT_FOUND',
 
-  GRC_START_FAILED: 50,
-  GRC_STREAM_ACTIVE: 51,
-  GRC_STREAM_NOT_ACTIVE: 53,
+  50: 'GRC_START_FAILED',
+  51: 'GRC_STREAM_ACTIVE',
+  53: 'GRC_STREAM_NOT_ACTIVE',
+
+  3107: 'Another request still pending.',
 }
 
 class Command {
@@ -60,4 +62,4 @@ class Command {
   }
 }
 
-export { Command, TotalStationErrors }
+export { Command, TotalStationResponses }
