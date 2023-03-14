@@ -1,6 +1,5 @@
 import { CommandQueue } from './helpers/CommandQueue.js'
 import { Command } from './models/Command.js'
-import { zeaDebug } from './helpers/zeaDebug.js'
 
 class StreamerDbBridge {
   constructor(streamer, session) {
@@ -16,8 +15,6 @@ class StreamerDbBridge {
     //const res = await this.streamer.send('uptime')
 
     this.session.onCommandCreated((data) => {
-      zeaDebug('StreamerDbBridge command:\n%O', data)
-
       const command = new Command(this.streamer, this.session, data)
       this.commandQueue.addCommand(command)
     })
