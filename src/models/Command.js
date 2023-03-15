@@ -1,8 +1,8 @@
 import { db } from '../helpers/firebase.js'
 
 const TotalStationCommands = {
-  turnTelescope: (x, y, z) => `%R8Q,7:1,${x},${y},${z}\r\n`,
   START_STREAM: '%R8Q,4:\r\n',
+  turnTelescope: (x, y, z) => `%R8Q,7:1,${x},${y},${z}\r\n`,
   SAMPLE_DIST: '%R8Q,1:\r\n',
   SEARCH: '%R8Q,6:1\r\n',
   STOP_STREAM: '%R8Q,5:\r\n',
@@ -35,10 +35,13 @@ class Command {
   async invoke() {
     const { x, y, z } = this.data.position
 
-    this.streamer.send(TotalStationCommands.turnTelescope(x, y, z))
     this.streamer.send(TotalStationCommands.START_STREAM)
-    this.streamer.send(TotalStationCommands.SAMPLE_DIST)
-    this.streamer.send(TotalStationCommands.SEARCH)
+    this.streamer.send(TotalStationCommands.turnTelescope(x, y, z))
+
+    const localQueue = [
+      TotalStationCommands.SAMPLE_DIST,
+      TotalStationCommands.SEARCH,
+    ]
 
     this.streamer.on('streaming-response', async (response) => {
       const responseCode = response.substring(response.lastIndexOf(':') + 1)
@@ -52,11 +55,18 @@ class Command {
 
         throw new Error(TotalStationResponses[responseCode])
       }
+
+      const next = localQueue.shift()
+
+      if (!next) {
+        return
+      }
+
+      this.streamer.send(next)
     })
 
     return new Promise(async (resolve) => {
       this.streamer.on('point', async (point) => {
-        this.streamer.send(TotalStationCommands.STOP_STREAM)
 
         await this.#markAsInvoked()
 
