@@ -29,40 +29,25 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
   const [station, setStation] = useState('')
   const [documents, setDocuments] = useState([])
 
+ 
+
   // let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac', '00:17:17:03:82:76']
   let LuigiMac = '00:17:17:06:8a:a5'
   let MarioMac = '00:17:17:06:9f:ac'
 
   const handleChangeSession = (event) => {
+    console.log(
+      'handleChangeSession', event.target.value
+    )
     setsessionID(event.target.value)
     setSessionIDValue(event.target.value)
   }
+  
   const handleChangeStation = (event) => {
+    console.log("handleChangeStation", event.target.value)
     setStation(event.target.value)
     setStationIDValue(event.target.value)
   }
-
-  // const getSession = new ClientSession();
-  
-  // console.log("getSession", sessionAwaited)
-  // const getSession = new ClientSession();
-  // getSession.init();
-
-  // useEffect(() => {
-
-  //   // const sessionAwaited  = helpAwait()
-  //   // console.log("getSession.dbSessions", getSession)
-  //   // setDocuments(getSession);
-  //   // console.log("documents", documents)
-
-  //   helpAwait().then((result) => {
-  //     if(result){
-  //       console.log("result", result)
-  //       setDocuments(result);
-  //     }
-  //   })
-
-  // }, [])
 
   useEffect(() => {
     helpAwait().then(result => {
@@ -74,43 +59,30 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
   }, []);
 
   let sessionItems 
-  // console.log(documents.length )
-  // useEffect(() => {
 
-  //   if (documents) {
-  //     console.log("documents length", documents)
-  //     sessionItems = documents.map((doc) => (
-  //     <option key={doc.id} value={doc.id}>
-  //       {doc.name}
-  //     </option>
-  //     ))
-  //   } else {
-      
-  //     console.log("documents no length", documents)
-  //     sessionItems = [ (<div>Loading...</div>)]
-  //   }
-  // }, [documents])
 
   useEffect(() => {
     console.log("documents length", documents)
     // if (documents){
       sessionItems = documents.map((doc) => (
         <div style={{height: '250px !important'}}>
-          <option key={doc.id} value={doc.id}>
+          <MenuItem key={doc.id} value={doc.id}>
             {doc.name}
-          </option>
+          </MenuItem>
         </div>
       ))
     // }
     }, [documents])
 
+   const sessionItem = documents.map((doc) => (
+      // <div style={{height: '250px !important'}} key={doc.id}>
+        <MenuItem  key={doc.id} value={doc.id}>
+          {doc.name}
+        </MenuItem>
+      // </div>
+    ))
 
 
-  // const sessionItems = (
-  // <div>
-  //   hello
-  // </div>
-  // )
 
   return (
     <div style={{ marginTop: '10%' }}>
@@ -129,24 +101,20 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
           </Select>
         </FormControl>
 
+        <br />
+        <br />
+
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Session ID </InputLabel>
+          <InputLabel id="select-session-label">Session ID </InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId="select-session-label"
+            id="select-session"
             value={sessionID}
-            label={sessionID}//"session ID"
+            label="session ID"//{sessionID}//"session ID"
             onChange={handleChangeSession}
           >
-            {/* {sessionItems} */}
-            {documents.map(document => (
-              
-              <option key={document.id} >
-                {/* <div key={document.id} > */}
-                  {document.name}
-                {/* </div> */}
-              </option>
-            ))}
+            {sessionItem}
+
           </Select>
         </FormControl>
       </Box>
