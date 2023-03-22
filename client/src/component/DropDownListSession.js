@@ -8,7 +8,7 @@ import Select from '@mui/material/Select/index.js'
 
 // import { db, getSessions } from '../helpers/clientFirebase.js' //client\helpers\clientFirebase.js
 import {ClientSession} from '../models/ClientSession.js'
-import { async } from '@firebase/util'
+// import { async } from '@firebase/util'
 
 // import { collection, getDocs } from "firebase/firestore"; 
 
@@ -58,21 +58,21 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
     });
   }, []);
 
-  let sessionItems 
+  // let sessionItems 
 
 
-  useEffect(() => {
-    console.log("documents length", documents)
-    // if (documents){
-      sessionItems = documents.map((doc) => (
-        <div style={{height: '250px !important'}}>
-          <MenuItem key={doc.id} value={doc.id}>
-            {doc.name}
-          </MenuItem>
-        </div>
-      ))
-    // }
-    }, [documents])
+  // useEffect(() => {
+  //   console.log("documents length", documents)
+  //   // if (documents){
+  //     sessionItems = documents.map((doc) => (
+  //       <div style={{height: '250px !important'}}>
+  //         <MenuItem key={doc.id} value={doc.id}>
+  //           {doc.name}
+  //         </MenuItem>
+  //       </div>
+  //     ))
+  //   // }
+  //   }, [documents])
 
    const sessionItem = documents.map((doc) => (
       // <div style={{height: '250px !important'}} key={doc.id}>

@@ -13,7 +13,7 @@ import { initializeApp } from 'firebase/app';
 // import firebase from 'firebase/compat/app';
 // import firebase from 'firebase/app';
 // import 'firebase/firestore';
-import { collection, getDocs, getFirestore } from "firebase/firestore"; 
+import { collection, getDocs, getFirestore, orderBy, query } from "firebase/firestore"; 
 
 // import serviceAccount from './firebase_service_account_key.json' //assert { type: 'json' }
 //import serviceAccount from '../../firebase_service_account_key.json';
@@ -22,17 +22,9 @@ import { collection, getDocs, getFirestore } from "firebase/firestore";
 
 
 class ClientSession {
-  // #dbSessions
   
   constructor(){
-  // constructor(id){
-  //constructor(id, name) {
-    // if (!id) {
-    //   throw new Error('Missing `id` arg.')
-    // }
 
-    //console.log('session id', id,'hDrHo89VPEpFFqfqFvNI',  db)
-    // this.id = id
     console.log("ClientSession constructor")
     this.name = 'Polygon';
     
@@ -62,11 +54,12 @@ class ClientSession {
 
     console.log("db", db)
 
-    const querySnapshot = await getDocs(collection(db, "sessions"));
+    // const querySnapshot = await getDocs(collection(db, "sessions"));
+    // const dbGrab = await getDocs(collection(db, "sessions"));
+    // const querySnapshot = query(dbGrab, orderBy("name", "desc"));
+    const dbGrab = await query(collection(db, "sessions"), orderBy("name", "desc"));
+    const querySnapshot = await getDocs(dbGrab);
 
-    // console.log("querySnapshot", querySnapshot)
-
-    // this.#dbSessions =  querySnapshot.forEach((doc) => {
     const docs = []
      querySnapshot.forEach((doc) => {
       
@@ -75,26 +68,7 @@ class ClientSession {
       // this.#dbSessions = docs;
       this.dbSessions =  docs;
     });
-    // console.log("dbSessions", this.#dbSessions)
 
-    // const docRef = db.collection('sessions').doc(this.id)
-    // const doc = await docRef.get()
-    // //console.log('db.collection()session /n', db.collection('sessions').doc('hDrHo89VPEpFFqfqFvNI').get())
-    
-    // if (!doc.exists) {
-    //   throw new Error(
-    //   `Session not found. Id: "${this.id}". Session must be created using the web app`
-    //   )
-    // }
-
-    // //const sessionRef = db.collection(collectionId).doc(this.id)
-    // //const doc = await sessionRef.get()
-    
-    // zeaDebug("Found existing session with id '%s'", this.id)
-
-    // if (this.unsub) {
-    //   this.unsub()
-    // }
     
     
   }

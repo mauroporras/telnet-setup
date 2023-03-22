@@ -9,7 +9,7 @@ import { getFirestore} from 'firebase/firestore/lite';
 // import firebase from 'firebase/compat/app';
 // import firebase from 'firebase/app';
 // import 'firebase/firestore';
-import { collection, getDocs } from "firebase/firestore"; 
+// import { collection, getDocs } from "firebase/firestore"; 
 
 // import serviceAccount from './firebase_service_account_key.json' //assert { type: 'json' }
 //import serviceAccount from '../../firebase_service_account_key.json';
