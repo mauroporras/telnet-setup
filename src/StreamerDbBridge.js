@@ -18,6 +18,9 @@ class StreamerDbBridge {
     })
 
     this.streamer.on('point', (point) => {
+      if(this.commandQueue.isInProgress) return
+      console.log('start point', point)
+      
       this.session.addPoint(point)
     })
   }

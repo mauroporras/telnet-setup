@@ -27,49 +27,78 @@ const TotalStationResponses = {
 
 class Command {
   constructor(streamer, session, data) {
+    console.log("Command constructor", data)
     this.streamer = streamer
     this.session = session
     this.data = data
   }
 
   async invoke() {
-    const { x, y, z } = this.data.position
+    const { x, y, z } = this.data.position //switched x and y to match the total station
 
+    // send a command to initialize the stream, then send the command to start the stream
+    console.log("Stream started")
+    this.streamer.send(TotalStationCommands.STOP_STREAM)
     this.streamer.send(TotalStationCommands.START_STREAM)
-    this.streamer.send(TotalStationCommands.turnTelescope(x, y, z))
+    console.log("Stream start finished")
 
     const localQueue = [
-      TotalStationCommands.SAMPLE_DIST,
+      // TotalStationCommands.START_STREAM,
+      TotalStationCommands.turnTelescope(y, x,  z),
       TotalStationCommands.SEARCH,
+      TotalStationCommands.SAMPLE_DIST,
+      
     ]
 
     this.streamer.on('streaming-response', async (response) => {
       const responseCode = response.substring(response.lastIndexOf(':') + 1)
 
-      if (responseCode !== '0') {
-        if (responseCode === '51') {
-          this.streamer.send(TotalStationCommands.STOP_STREAM)
 
-          return
-        }
-
-        throw new Error(TotalStationResponses[responseCode])
-      }
-
-      const next = localQueue.shift()
+      let next = localQueue.at(0)
 
       if (!next) {
         return
       }
+      
+      
+      // if the last return code was 3107 (another request still pending) then we should loop until that command resolves and passes a '0' response code
+      // this will fail if the command does not resolve
+      if (responseCode == '3107') { 
+        setTimeout(() => {  console.log("previous still running (Code 3107), wait 1/2 second"); }, 500);
+      }
+      else{
+        console.log("command to  send", responseCode, next) 
+        next = localQueue.shift()
+        this.streamer.send(next)
+      }
 
-      this.streamer.send(next)
+      //exceptions
+      //what if reflector is not found? should this code invoke a true for the command? 
+      //currently runs and extra time before stopping
+      if (responseCode !== '0') {
+        if (responseCode == '31') {
+          console.log("response error", TotalStationResponses[responseCode])
+          // this.streamer.send(TotalStationCommands.STOP_STREAM)
+          // mark command as invoked
+          return
+        }
+        if (responseCode == '41') {
+          console.log("response error", TotalStationResponses[responseCode])
+          // this.streamer.send(TotalStationCommands.STOP_STREAM)
+          return
+        }
+      }
+      //notes on exceptions
+      //streaming app needs to be open
+      //no notifications can be active on the total station
+      
     })
 
     return new Promise(async (resolve) => {
       this.streamer.on('point', async (point) => {
 
         await this.#markAsInvoked()
-
+        console.log("point and anchor", point, this.data.anchor)
         await this.session.addPoint(point, this.data.anchor)
 
         resolve()
