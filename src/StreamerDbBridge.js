@@ -13,6 +13,7 @@ class StreamerDbBridge {
     await this.session.init()
 
     this.session.onCommandCreated((data) => {
+      console.log('command created')//, data)
       const command = new Command(this.streamer, this.session, data)
       this.commandQueue.addCommand(command)
     })
