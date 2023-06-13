@@ -27,7 +27,7 @@ const TotalStationResponses = {
 
 class Command {
   constructor(streamer, session, data) {
-    console.log("Command constructor", data)
+    // console.log("Command constructor", data)
     this.streamer = streamer
     this.session = session
     this.data = data
@@ -36,6 +36,12 @@ class Command {
   async invoke() {
     const { x, y, z } = this.data.position //switched x and y to match the total station
 
+    // Isues: 
+    // findings, without this points and anchors are added multiple times
+    //remove all listeners to avoid duplicate listeners on the same event
+    this.streamer.removeAllListeners('streaming-response')
+    this.streamer.removeAllListeners('point')
+
     // send a command to initialize the stream, then send the command to start the stream
     console.log("Stream started")
     this.streamer.send(TotalStationCommands.STOP_STREAM)
@@ -43,16 +49,20 @@ class Command {
     console.log("Stream start finished")
 
     const localQueue = [
+      // TotalStationCommands.STOP_STREAM,
       // TotalStationCommands.START_STREAM,
       TotalStationCommands.turnTelescope(y, x,  z),
       TotalStationCommands.SEARCH,
+      //what if nothing is found? should this code invoke a true for the command? handled in the response code
       TotalStationCommands.SAMPLE_DIST,
       
     ]
-
-    this.streamer.on('streaming-response', async (response) => {
+    
+    // this.streamer.on('streaming-response', async (response) => { //NB
+    this.streamer.on('streaming-response',  (response) => {
+      // console.log("response code", response)
       const responseCode = response.substring(response.lastIndexOf(':') + 1)
-
+      // console.log("response code", responseCode)
 
       let next = localQueue.at(0)
 
@@ -68,6 +78,13 @@ class Command {
       }
       else{
         console.log("command to  send", responseCode, next) 
+        if (responseCode == '31') {
+          console.log("response error", TotalStationResponses[responseCode])
+          // this.streamer.send(TotalStationCommands.STOP_STREAM)
+          // mark command as invoked
+          this.#markAsInvoked()
+          return
+        }
         next = localQueue.shift()
         this.streamer.send(next)
       }
@@ -80,6 +97,7 @@ class Command {
           console.log("response error", TotalStationResponses[responseCode])
           // this.streamer.send(TotalStationCommands.STOP_STREAM)
           // mark command as invoked
+
           return
         }
         if (responseCode == '41') {
@@ -91,6 +109,8 @@ class Command {
       //notes on exceptions
       //streaming app needs to be open
       //no notifications can be active on the total station
+      // this.streamer.send(TotalStationCommands.STOP_STREAM)
+      
       
     })
 
@@ -100,7 +120,6 @@ class Command {
         await this.#markAsInvoked()
         console.log("point and anchor", point, this.data.anchor)
         await this.session.addPoint(point, this.data.anchor)
-
         resolve()
       })
     })
@@ -109,6 +128,7 @@ class Command {
   async #markAsInvoked() {
     const docRef = db.collection('commands').doc(this.data.id)
     await docRef.update({ isInvoked: true })
+    
   }
 }
 
