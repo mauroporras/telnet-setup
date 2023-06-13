@@ -9,7 +9,8 @@ import cors from 'cors'
 // import path from 'path'
 import StreamerEntry from './server/StreamerEntry.js'
 
-// import {StreamerBridge} from './server/StreamBrowser.js'
+// const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE || ''
+// const ZEA_SESSION_ID = process.env.ZEA_SESSION_ID || ''
 
 const PORT = process.env.PORT || 3001
 
@@ -22,6 +23,8 @@ const PORT = process.env.PORT || 3001
 //   dataReturn = await data
 //   // return dataReturn
 // }
+
+
 
 // console.log('returned streamBrowser', dataReturn)
 
@@ -44,21 +47,18 @@ let i = 1
 app.use('/api/button', function (req, res) {
   console.log('api button')
   var countValue = req.body.title
-  var ip = req.body.IPAddress
-  var ID = req.body.sessionID
+  var stationMac = req.body.stationMac
+  var sessionId = req.body.sessionID
+  var stationName = req.body.stationNames
   console.clear()
 
   console.log('\n', '\n', '\t Telnet Session Starting')
-  
-  console.log('CountValue is', ip)
-  console.log('CountValue is', ID)
-  StreamerEntry(ip, ID)
-  // res.json({ message: 'result'});
+  // console.log('req.body', req.body)
+  console.log('Mac Value is', stationMac)
+  console.log('ID Value is', sessionId)
+  console.log('stationName Value is', stationName)
+  StreamerEntry(stationMac, sessionId, stationName)
 
-  // streamerNudger.sendReq(req)
-  // countValue.on('data', (data) => {
-  //   res.json({ message: data});
-  // })
 })
 
 app.listen(PORT, () => {

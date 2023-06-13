@@ -20,17 +20,10 @@ const App = () => {
   //const [ipValue, setIpValue] = useState('')
   const [sessioniDValue, setSessionIDValue] = useState('')
   const [stationiDValue, setStationIDValue] = useState('')
+  const [stationName, setStationName] = useState('')
 
 
   const [data, setData] = useState(null);
-
-  // async function getTodos() {
-  //   // With all properties
-  //    let body = {
-  //     start: true,
-  //     title: "This is POST request with body",
-  //     completed: true
-  //   };
 
   
     useEffect(() => {
@@ -46,7 +39,9 @@ const App = () => {
           title: 'start telnet streamer',
           //IPAddress: ipValue,
           sessionID: sessioniDValue,
-          stationID: stationiDValue,
+          stationMac: stationiDValue,
+          stationNames: stationName,
+          
          })
       };
   
@@ -62,38 +57,12 @@ const App = () => {
 
     console.log(data)
 
-    // axios
-    //   .post('http://localhost:3001/api', body)
-    //   .then(function(response) {
-    //     console.log(response.data);
-    //   })
-    //   .catch(function(error) {
-    //     console.log(error);
-    //   });
-  // }
-
-
 
   if (buttonStatus){
 
     console.log('button2')
-    // setButtonStatus(false)
   }
 
-  // useEffect(() => {
-  //   fetch("/api")
-  //     .then((res) => res.json())
-  //     .then((data) => setData(data.message));
-  // }, []);
-
-  // return (
-  //   <div className="App">
-  //     <header className="App-header">
-  //       <img src={logo} className="App-logo" alt="logo" />
-  //       <p>{!data ? "Loading..." : data}</p>
-  //     </header>
-  //   </div>
-  // );
 
 
   return (
@@ -111,7 +80,7 @@ const App = () => {
       </div>
       <div className='ui row'>
         <div className='column eight wide'>
-          <DropDownListSession setSessionIDValue={setSessionIDValue} setStationIDValue={setStationIDValue}/>
+          <DropDownListSession setSessionIDValue={setSessionIDValue} setStationIDValue={setStationIDValue} setStationName={setStationName}/>
         </div>
         <div className='column eight wide' >
             {/* <div style={{marginTop: "5%"}}>

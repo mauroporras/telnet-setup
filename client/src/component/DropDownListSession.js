@@ -24,7 +24,7 @@ async function helpAwait() {
 }
 
 
-export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
+export default  function BasicSelect({ setSessionIDValue, setStationIDValue, setStationName }) {
   const [sessionID, setsessionID] = useState('')
   const [station, setStation] = useState('')
   const [documents, setDocuments] = useState([])
@@ -32,8 +32,10 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
  
 
   // let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac', '00:17:17:03:82:76']
-  let LuigiMac = '00:17:17:06:8a:a5'
-  let MarioMac = '00:17:17:06:9f:ac'
+  let LuigiMac = '00:17:17:06:8a:a5'//, 'Luigi']
+  let MarioMac = '00:17:17:06:9f:ac'//, 'Mario']
+
+  const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '00:17:17:06:9f:ac': 'Mario'}
 
   const handleChangeSession = (event) => {
     console.log(
@@ -44,9 +46,12 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
   }
   
   const handleChangeStation = (event) => {
-    console.log("handleChangeStation", event.target.value)
+    // const { myValue } = event.currentTarget;
+    console.log("handleChangeStation", lookupValue[event.target.value], event.target)
+
     setStation(event.target.value)
     setStationIDValue(event.target.value)
+    setStationName(lookupValue[event.target.value])
   }
 
   useEffect(() => {
@@ -74,6 +79,8 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
   //   // }
   //   }, [documents])
 
+
+
    const sessionItem = documents.map((doc) => (
       // <div style={{height: '250px !important'}} key={doc.id}>
         <MenuItem  key={doc.id} value={doc.id}>
@@ -96,8 +103,8 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue }) {
             label="Multistation"
             onChange={handleChangeStation}
           >
-            <MenuItem value={LuigiMac}>Luigi</MenuItem>
-            <MenuItem value={MarioMac}>Mario</MenuItem>
+            <MenuItem name="Luigi" value={LuigiMac} id="long-menu">Luigi</MenuItem>
+            <MenuItem name="Mario" value={MarioMac} id="long-menu">Mario</MenuItem>
           </Select>
         </FormControl>
 

@@ -1,12 +1,7 @@
-//import  randomUUID  from 'crypto-random-string'
-//import  randomUUID  from 'crypto'
-//import { randomUUID } from 'crypto-random-string.js'
-//const randomUUID = require('crypto-random-string')
+
 import { db, serverTimestamp } from '../helpers/firebase.js'
 import { zeaDebug } from '../helpers/zeaDebug.js'
 
-// import {expressServer} from '../StreamBrowser.js'
-// import {streamBrowser} from '../../index.js'
 
 class Session {
   #latestSelectedAnchor
@@ -20,17 +15,65 @@ class Session {
     //console.log('session id', id,'hDrHo89VPEpFFqfqFvNI',  db)
     this.id = id
   }
-  
-
 
   async init() {
     await this.#observeSession()
   }
 
+  async addPoint(point, anchor) {
+    if (!anchor && !this.#latestSelectedAnchor) {
+      console.warn(
+        'Missing `anchor` and `latestSelectedAnchor`. Did you remember to #init the session?'
+      )
+
+      return
+    }
+    // console.log('anchor || this.#latestSelectedAnchor', anchor, this.#latestSelectedAnchor)
+    console.log('anchor selected : ', anchor)
+    const theAnchor = anchor || this.#latestSelectedAnchor // Isues: this.#latestSelectedAnchor is holding onto previouw anchor
+
+
+    const docRef = db.collection('points').doc()
+    const { id } = docRef
+
+    const data = {
+      id,
+      createdAt: serverTimestamp(),
+      sessionId: this.id,
+      anchor: theAnchor,
+      string: point,
+    }
+    // console.log('data :', data)
+    await docRef.set(data)
+
+    zeaDebug("Created new point with id '%s' and anchor '%s'", id, theAnchor)
+
+    return id
+  }
+
+  onCommandCreated(callback) {
+    const query = db
+      .collection('commands')
+      .where('sessionId', '==', this.id)
+      .where('isInvoked', '==', false)
+      .orderBy('createdAt')
+
+    const unsub = query.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          callback(change.doc.data())
+        }
+      })
+    })
+
+    return unsub
+  }
+
+
+
   async #observeSession() {
     const docRef = db.collection('sessions').doc(this.id)
     const doc = await docRef.get()
-    //console.log('db.collection()session /n', db.collection('sessions').doc('hDrHo89VPEpFFqfqFvNI').get())
     
     if (!doc.exists) {
       throw new Error(
@@ -38,16 +81,9 @@ class Session {
       )
     }
 
-    //const sessionRef = db.collection(collectionId).doc(this.id)
-    //const doc = await sessionRef.get()
     
     zeaDebug("Found existing session with id '%s'", this.id)
 
-    //this.unsubscribe = sessionRef.onSnapshot(
-    //  (sessionSnapshot) => {
-    //    if (!sessionSnapshot.exists) {
-    //      return
-    //    }
     if (this.unsub) {
       this.unsub()
     }
@@ -65,60 +101,6 @@ class Session {
     )
   }
   
-  async execute(cmd) {
-  // try to add a call after inital connection 
-    console.log('session', cmd)
-    //const result = await this.telnet.send(cmd)
-    //const result = await this.telnet.exec(cmd)
-    //console.log('streamer bridge result ', result)
-    //this.telnet.exec(cmd, (err, res) => {
-     // console.log(err, res)
-    //})
-  }
-
-  async addPoint(point) {
-    //if (!this.doc) {
-    //  await this.fetchOrCreate()
-    //}
-    if (!this.#latestSelectedAnchor) {
-      console.warn("there's no #latestSelectedAnchor. did you remember to init the session?")
-      
-
-    //const collectionId = 'points'
-    }
-
-    //const pointId = await randomUUID(36)
-    //console.log (pointId)
-    const docRef = db.collection('points').doc()
-    const {id} = docRef
-
-    const data = {
-    //  id: pointId,
-    id,
-      createdAt: serverTimestamp(),
-      sessionId: this.id,
-      anchor: this.#latestSelectedAnchor,
-      string: point,
-    }
-     //console.log(data)
-
-    // expressServer(data)
-
-    //const pointRef = db.collection(collectionId).doc(pointId)
-    //await pointRef.create(data)
-    
-    await docRef.set(data)
-
-    zeaDebug(
-      "Created new point with id '%s' and anchor '%s'",
-      id,
-      this.#latestSelectedAnchor
-    )
-
-    //console.log("anchor selected", this.latestSelectedAnchor)
-
-    return id
-  }
 }
 
 export { Session }

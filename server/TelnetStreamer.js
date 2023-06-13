@@ -1,14 +1,14 @@
 import net from 'net'
 import Telnet from 'telnet-client'
-import util from 'util'
-
+// import util from 'util'
 import { zeaDebug } from './helpers/zeaDebug.js'
-
 import { BaseStreamer } from './BaseStreamer.js'
-
 import find from 'local-devices'
+//LuigiMacAddress = '00:17:17:06:8a:a5'
+//MarioMacAddress = '00:17:17:06:9f:ac'
+let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac'] //, '00:17:17:03:82:76'
 
-let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac', '00:17:17:03:82:76']
+const SURVEY_STREAMING_RESPONSE_PREFIX = '%R8P'
 
 async function getIp() {
   //find().then(devices => { console.log('found the IP in the promise', devices)
@@ -18,7 +18,8 @@ async function getIp() {
 
   while (notFound){
     found = await find()
-    console.log('what did we find', i, found.length, found)
+    console.log(`what did we find on network "${found.length}", max number pings "${i}"`)
+    // console.log('what did we find', i, found.length, found)
 
 
     if (i < 5 || found.length < 1) i++
@@ -26,25 +27,11 @@ async function getIp() {
 
 
   }
-  // const found1 = await find()
-  // console.log('see whats around', found)
-  // const found = await find({ address: '192.168.1.0-192.168.1.25' })
 
-  //return find().then(devices => {
-  console.log('looking for something inside', found)
-
-  //return devices})
-  return await found
+  return  found
 }
 
-// attempting to add messages
-const utf8Encode = new TextEncoder()
 
-const distanceCmd = '%R8Q,1:'
-const startStreamCmd = '%R8Q,4:'
-console.log('%R8Q,4:', startStreamCmd)
-//var cmd =  utf8Encode.encode(startStreamCmd)
-var cmd2 = utf8Encode.encode(startStreamCmd)
 
 class TelnetStreamer extends BaseStreamer {
   constructor(params) {
@@ -53,8 +40,9 @@ class TelnetStreamer extends BaseStreamer {
     this.params = params
     this.ipAddress = ''
 
-    this.bootstrapTelnetClient()
-    // this.#bootstrapTelnetClient()
+    // this.bootstrapTelnetClient() // Linux
+    // this.#bootstrapTelnetClient() // Windows
+
   }
 
   async connect() {
@@ -64,135 +52,72 @@ class TelnetStreamer extends BaseStreamer {
     }
 
     const socket = new net.Socket()
-
-    const foundIt = await getIp()
+    this.socket = socket
+    const foundStationIP = await getIp()
 
     try {
       var ipToReturn
-      foundIt.forEach((each) => {
-        console.log('LuigiMac', each.mac)
-        if (each.mac.includes(LuigiMac[0]) || each.mac.includes(LuigiMac[1]) || each.mac.includes(LuigiMac[2])) {
+      
+      console.log('stationIP', this.params, this.params.stationMacs, this.params.stationNames)
+      foundStationIP.forEach((each) => {
+        // console.log('Station Mac Address found', each.mac)
+        // if (each.mac.includes(LuigiMac[0]) || each.mac.includes(LuigiMac[1]) ) {
+        if (each.mac.includes(this.params.stationMacs)) {
           // console.log('LuigiMac', each.ip)
           ipToReturn = each.ip
         }
+        else {
+          console.log('No Station Mac Address found, did you select the right Multistation? Mario vs Luigi?')
+        }
       })
-      console.log('TSIP', ipToReturn)
 
-      // this.params.host = foundIt[0].ip //currently a little risky, grabs the first ip address.
+
+      console.log('Ip address found for that Mac address', ipToReturn)
+      
+
       this.params.host = ipToReturn
     } catch {
-      console.log('IP not found, try again')
+      console.log('IP not found, restart server and try again')
     }
 
     console.log('looking for something this.params.host', this.params.host)
-    console.log('session streaming')
+    console.log('------------------session streaming------------------')
 
-    socket.on('error', (err) => console.log(err))
-    socket.on('data', (data) => {
-      const decoded = data.toString('utf8')
+    // socket.on('error', (err) => console.log(err))
+    socket.on('error', (err) => console.error('Socket error:', err))
 
-      console.log(decoded)
-      zeaDebug(decoded)
-
-      this.emit('data', decoded)
-    })
-
-    socket.on('ready', (ready) => {
-      // added for sending sommands
-
-      console.log(ready)
-      zeaDebug(ready)
-
-      //this.emit('ready', cmd2)
-    })
+    socket.on('data', this.#handleData.bind(this))
 
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
     })
 
-    // try to add a call after inital connection - did not work here
-
-    return
-    // nothing is reached past this point
-    /*
-    zeaDebug('TelnetStreamer params:\n%O', params)
-
-    try {
-      await this.telnet.connect(params)
-    } catch (error) {
-      console.info(error)
-    }*/
+  
   }
 
-  async send(data) {
-    const sentData = await this.telnet.send(data)
-    console.log('telnetstreamer', sentData)
-    return sentData
+ 
+  send(data) {
+    // console.log('send data', data, this.socket)
+    this.socket.write(data)
+    zeaDebug('Sent:', data)
   }
 
-  async execute(cmd) {
-    // try to add a call after inital connection
-    console.log('telnetstreamer', cmd)
-    //const result = await this.telnet.send(cmd)
-    //const result = await this.telnet.exec(cmd)
-    //console.log('streamer bridge result ', result)
-    //this.telnet.exec(cmd, (err, res) => {
-    // console.log(err, res)
-    //})
-  }
 
-  bootstrapTelnetClient() {
-    // #bootstrapTelnetClient() {
-    this.telnet = new Telnet()
+  #handleData(data) {
+    const decoded = data.toString('utf8').trim()
 
-    this.telnet.on('connect', () => {
-      zeaDebug('Connected.')
-    })
+    zeaDebug('Received:', decoded)
 
-    this.telnet.on('data', (data) => {
-      const decoded = data.toString('utf8')
-      console.log('starting data', this.telnet)
+    const isStreamingResponse = decoded.startsWith(
+      SURVEY_STREAMING_RESPONSE_PREFIX
+    )
 
-      console.log('starting command in data')
-      this.telnet.exec(cmd, (err, res) => {
-        console.log(res)
-      })
+    // A point looks like this:
+    // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
 
-      this.emit('data', decoded)
-    })
+    const eventType = isStreamingResponse ? 'streaming-response' : 'point'
 
-    this.telnet.on('ready', (cmd) => {
-      zeaDebug('Ready.')
-
-      console.log('starting command', this.telnet)
-      this.telnet.exec(cmd, (err, res) => {
-        console.log(err, res)
-      })
-    })
-
-    this.telnet.on('writedone', () => {
-      zeaDebug('Writedone.')
-    })
-
-    this.telnet.on('timeout', () => {
-      zeaDebug('Timeout.')
-    })
-
-    this.telnet.on('failedlogin', () => {
-      zeaDebug('Failed login.')
-    })
-
-    this.telnet.on('error', () => {
-      zeaDebug('Error.')
-    })
-
-    this.telnet.on('end', () => {
-      zeaDebug('End.')
-    })
-
-    this.telnet.on('close', () => {
-      zeaDebug('Close.')
-    })
+    this.emit(eventType, decoded)
   }
 }
 

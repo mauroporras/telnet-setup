@@ -39,14 +39,25 @@ class ClientSession {
   // async #observeSession() {
   async observeSession() {
 
+    // const firebaseConfig = {
+    //   apiKey: "AIzaSyCwm0Nex3W_jTBFZWAofXH7r4mTa3bdosw",
+    //   authDomain: "zahner-production-8e2af.firebaseapp.com",
+    //   projectId: "zahner-production-8e2af",
+    //   storageBucket: "zahner-production-8e2af.appspot.com",
+    //   messagingSenderId: "379521829525",
+    //   appId: "1:379521829525:web:ca6517410571680ab6299c",
+    //   measurementId: "G-7X3BB5E4MG"
+    // };
+
     const firebaseConfig = {
-      apiKey: "AIzaSyCwm0Nex3W_jTBFZWAofXH7r4mTa3bdosw",
-      authDomain: "zahner-production-8e2af.firebaseapp.com",
-      projectId: "zahner-production-8e2af",
-      storageBucket: "zahner-production-8e2af.appspot.com",
-      messagingSenderId: "379521829525",
-      appId: "1:379521829525:web:ca6517410571680ab6299c",
-      measurementId: "G-7X3BB5E4MG"
+      apiKey: "AIzaSyDhrTyj2hISapfNqAyGEEb5p2s47wi9_mA",
+      authDomain: "zahner-development.firebaseapp.com",
+      databaseURL: "https://zahner-development-default-rtdb.firebaseio.com",
+      projectId: "zahner-development",
+      storageBucket: "zahner-development.appspot.com",
+      messagingSenderId: "71481654606",
+      appId: "1:71481654606:web:f8d33f05cc676ffe27721f",
+      measurementId: "G-7P92N16XE1"
     };
     
     const app = initializeApp(firebaseConfig);
@@ -57,7 +68,7 @@ class ClientSession {
     // const querySnapshot = await getDocs(collection(db, "sessions"));
     // const dbGrab = await getDocs(collection(db, "sessions"));
     // const querySnapshot = query(dbGrab, orderBy("name", "desc"));
-    const dbGrab = await query(collection(db, "sessions"), orderBy("name", "desc"));
+    const dbGrab = await query(collection(db, "sessions"), orderBy("name", "asc"));
     const querySnapshot = await getDocs(dbGrab);
 
     const docs = []
