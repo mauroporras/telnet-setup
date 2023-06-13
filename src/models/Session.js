@@ -24,8 +24,9 @@ class Session {
 
       return
     }
+    console.log('anchor || this.#latestSelectedAnchor', anchor, this.#latestSelectedAnchor)
+    const theAnchor = anchor || this.#latestSelectedAnchor // Isues: this.#latestSelectedAnchor is holding onto previouw anchor
 
-    const theAnchor = anchor || this.#latestSelectedAnchor
 
     const docRef = db.collection('points').doc()
     const { id } = docRef
@@ -37,7 +38,7 @@ class Session {
       anchor: theAnchor,
       string: point,
     }
-
+    // console.log('data :', data)
     await docRef.set(data)
 
     zeaDebug("Created new point with id '%s' and anchor '%s'", id, theAnchor)
