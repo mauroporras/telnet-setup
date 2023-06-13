@@ -43,10 +43,11 @@ class Command {
     this.streamer.removeAllListeners('point')
 
     // send a command to initialize the stream, then send the command to start the stream
-    console.log("Stream started")
+    console.log("------------------ \n")
+    // console.log("Stream started")
     this.streamer.send(TotalStationCommands.STOP_STREAM)
     this.streamer.send(TotalStationCommands.START_STREAM)
-    console.log("Stream start finished")
+    // console.log("Stream start finished")
 
     const localQueue = [
       // TotalStationCommands.STOP_STREAM,
