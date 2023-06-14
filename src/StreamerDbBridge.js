@@ -18,7 +18,7 @@ class StreamerDbBridge {
       this.commandQueue.addCommand(command)
     })
 
-    this.streamer.on('point', (point) => {
+    this.streamer.once('point', (point) => { //on ->once
       if(this.commandQueue.isInProgress) return
       console.log('start point', point)
       

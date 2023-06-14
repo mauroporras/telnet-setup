@@ -39,8 +39,8 @@ class Command {
     // Isues: 
     // findings, without this points and anchors are added multiple times
     //remove all listeners to avoid duplicate listeners on the same event
-    this.streamer.removeAllListeners('streaming-response')
-    this.streamer.removeAllListeners('point')
+    // this.streamer.removeAllListeners('streaming-response')
+    // this.streamer.removeAllListeners('point')
 
     // send a command to initialize the stream, then send the command to start the stream
     console.log("Stream started")
@@ -59,7 +59,7 @@ class Command {
     ]
     
     // this.streamer.on('streaming-response', async (response) => { //NB
-    this.streamer.on('streaming-response',  (response) => {
+    this.streamer.once('streaming-response',  async (response) => {
       // console.log("response code", response)
       const responseCode = response.substring(response.lastIndexOf(':') + 1)
       // console.log("response code", responseCode)
@@ -115,7 +115,7 @@ class Command {
     })
 
     return new Promise(async (resolve) => {
-      this.streamer.on('point', async (point) => {
+      this.streamer.once('point', async (point) => { //once event vs on event
 
         await this.#markAsInvoked()
         console.log("point and anchor", point, this.data.anchor)
