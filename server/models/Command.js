@@ -36,6 +36,12 @@ class Command {
   async invoke() {
     const { x, y, z } = this.data.position //switched x and y to match the total station
 
+    // Isues:
+    // findings, without this points and anchors are added multiple times
+    //remove all listeners to avoid duplicate listeners on the same event
+    this.streamer.removeAllListeners('streaming-response')
+    this.streamer.removeAllListeners('point')
+
     // send a command to initialize the stream, then send the command to start the stream
     console.log('------------------ \n')
     // console.log("Stream started")
@@ -107,11 +113,11 @@ class Command {
     })
 
     return new Promise(async (resolve) => {
-      this.streamer.once('point', async (point) => {
-        //changed to .once from .on
+      this.streamer.on('point', async (point) => { //changed to .once from .on
         await this.#markAsInvoked()
         console.log(`POINT: ${point} \n ANCHOR : ${this.data.anchor} `)
         await this.session.addPoint(point, this.data.anchor)
+        console.log('----Command Complete----')
         resolve()
       })
     })

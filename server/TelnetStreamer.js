@@ -16,22 +16,19 @@ async function getIp() {
   var notFound = true
   var found
 
-  while (notFound){
+  while (notFound) {
     found = await find()
-    console.log(`what did we find on network "${found.length}", max number pings "${i}"`)
+    console.log(
+      `what did we find on network "${found.length}", max number pings "${i}"`
+    )
     // console.log('what did we find', i, found.length, found)
-
 
     if (i < 5 || found.length < 1) i++
     else notFound = false
-
-
   }
 
-  return  found
+  return found
 }
-
-
 
 class TelnetStreamer extends BaseStreamer {
   constructor(params) {
@@ -42,7 +39,6 @@ class TelnetStreamer extends BaseStreamer {
 
     // this.bootstrapTelnetClient() // Linux
     // this.#bootstrapTelnetClient() // Windows
-
   }
 
   async connect() {
@@ -57,23 +53,26 @@ class TelnetStreamer extends BaseStreamer {
 
     try {
       var ipToReturn
-      
-      console.log('stationIP', this.params, this.params.stationMacs, this.params.stationNames)
+
+      console.log(
+        'stationIP',
+        this.params,
+        this.params.stationMacs,
+        this.params.stationNames
+      )
       foundStationIP.forEach((each) => {
-        // console.log('Station Mac Address found', each.mac)
         // if (each.mac.includes(LuigiMac[0]) || each.mac.includes(LuigiMac[1]) ) {
         if (each.mac.includes(this.params.stationMacs)) {
           // console.log('LuigiMac', each.ip)
           ipToReturn = each.ip
-        }
-        else {
-          console.log('No Station Mac Address found, did you select the right Multistation? Mario vs Luigi?')
+        } else {
+          console.log(
+            'No Station Mac Address found, did you select the right Multistation? Mario vs Luigi?'
+          )
         }
       })
 
-
       console.log('Ip address found for that Mac address', ipToReturn)
-      
 
       this.params.host = ipToReturn
     } catch {
@@ -83,25 +82,33 @@ class TelnetStreamer extends BaseStreamer {
     console.log('looking for something this.params.host', this.params.host)
     console.log('------------------session streaming------------------')
 
-    // socket.on('error', (err) => console.log(err))
-    socket.on('error', (err) => console.error('Socket error:', err))
+    socket.on('error', (err) => {
+      console.error('Socket error:', err)
+
+      if (err.code === 'ECONNRESET') {
+        // exceptiong for when the socket is closed
+        console.log('Socket error, waiting 2 seconds to reconnect...')
+        setTimeout(() => {
+          console.log('Reconnecting...')
+          socket.connect(this.params.port, this.params.host, () => {
+            socket.write('%1POWR 1 ')
+          })
+        }, 2000)
+      }
+    })
 
     socket.on('data', this.#handleData.bind(this))
 
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
     })
-
-  
   }
 
- 
   send(data) {
     // console.log('send data', data, this.socket)
     this.socket.write(data)
     zeaDebug('Sent:', data)
   }
-
 
   #handleData(data) {
     const decoded = data.toString('utf8').trim()
