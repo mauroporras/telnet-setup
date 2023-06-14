@@ -36,14 +36,8 @@ class Command {
   async invoke() {
     const { x, y, z } = this.data.position //switched x and y to match the total station
 
-    // Isues: 
-    // findings, without this points and anchors are added multiple times
-    //remove all listeners to avoid duplicate listeners on the same event
-    this.streamer.removeAllListeners('streaming-response')
-    this.streamer.removeAllListeners('point')
-
     // send a command to initialize the stream, then send the command to start the stream
-    console.log("------------------ \n")
+    console.log('------------------ \n')
     // console.log("Stream started")
     this.streamer.send(TotalStationCommands.STOP_STREAM)
     this.streamer.send(TotalStationCommands.START_STREAM)
@@ -52,15 +46,14 @@ class Command {
     const localQueue = [
       // TotalStationCommands.STOP_STREAM,
       // TotalStationCommands.START_STREAM,
-      TotalStationCommands.turnTelescope(y, x,  z),
+      TotalStationCommands.turnTelescope(y, x, z),
       TotalStationCommands.SEARCH,
       //what if nothing is found? should this code invoke a true for the command? handled in the response code
       TotalStationCommands.SAMPLE_DIST,
-      
     ]
-    
+
     // this.streamer.on('streaming-response', async (response) => { //NB
-    this.streamer.on('streaming-response',  (response) => {
+    this.streamer.on('streaming-response', (response) => {
       // console.log("response code", response)
       const responseCode = response.substring(response.lastIndexOf(':') + 1)
       // console.log("response code", responseCode)
@@ -70,17 +63,17 @@ class Command {
       if (!next) {
         return
       }
-      
-      
+
       // if the last return code was 3107 (another request still pending) then we should loop until that command resolves and passes a '0' response code
       // this will fail if the command does not resolve
-      if (responseCode == '3107') { 
-        setTimeout(() => {  console.log("previous still running (Code 3107), wait 1/2 second"); }, 500);
-      }
-      else{
-        console.log("command to  send", responseCode, next) 
+      if (responseCode == '3107') {
+        setTimeout(() => {
+          console.log('previous still running (Code 3107), wait 1/2 second')
+        }, 500)
+      } else {
+        console.log('command to  send', responseCode, next)
         if (responseCode == '31') {
-          console.log("response error", TotalStationResponses[responseCode])
+          console.log('response error', TotalStationResponses[responseCode])
           // this.streamer.send(TotalStationCommands.STOP_STREAM)
           // mark command as invoked
           this.#markAsInvoked()
@@ -91,18 +84,18 @@ class Command {
       }
 
       //exceptions
-      //what if reflector is not found? should this code invoke a true for the command? 
+      //what if reflector is not found? should this code invoke a true for the command?
       //currently runs and extra time before stopping
       if (responseCode !== '0') {
         if (responseCode == '31') {
-          console.log("response error", TotalStationResponses[responseCode])
+          console.log('response error', TotalStationResponses[responseCode])
           // this.streamer.send(TotalStationCommands.STOP_STREAM)
           // mark command as invoked
 
           return
         }
         if (responseCode == '41') {
-          console.log("response error", TotalStationResponses[responseCode])
+          console.log('response error', TotalStationResponses[responseCode])
           // this.streamer.send(TotalStationCommands.STOP_STREAM)
           return
         }
@@ -111,13 +104,11 @@ class Command {
       //streaming app needs to be open
       //no notifications can be active on the total station
       // this.streamer.send(TotalStationCommands.STOP_STREAM)
-      
-      
     })
 
     return new Promise(async (resolve) => {
-      this.streamer.on('point', async (point) => {
-
+      this.streamer.once('point', async (point) => {
+        //changed to .once from .on
         await this.#markAsInvoked()
         console.log(`POINT: ${point} \n ANCHOR : ${this.data.anchor} `)
         await this.session.addPoint(point, this.data.anchor)
@@ -129,7 +120,6 @@ class Command {
   async #markAsInvoked() {
     const docRef = db.collection('commands').doc(this.data.id)
     await docRef.update({ isInvoked: true })
-    
   }
 }
 
