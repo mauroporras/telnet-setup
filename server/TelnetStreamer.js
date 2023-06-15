@@ -123,7 +123,7 @@ class TelnetStreamer extends BaseStreamer {
       SURVEY_STREAMING_RESPONSE_PREFIX
     )
     // if too much time has passed, reconnect
-    runTimeOut()
+    this.runTimeOut()
 
     // A point looks like this:
     // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
