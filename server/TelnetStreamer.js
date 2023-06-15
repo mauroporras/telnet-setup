@@ -136,7 +136,6 @@ class TelnetStreamer extends BaseStreamer {
   runTimeOut() {
     const start = Date.now()
     let runTime = Math.floor((Date.now() - start) / 1000) 
-    console.log('time', time)
 
     if (runTime > 100) {
 
