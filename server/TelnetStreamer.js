@@ -36,6 +36,7 @@ class TelnetStreamer extends BaseStreamer {
 
     this.params = params
     this.ipAddress = ''
+    this.counter = 0
 
     // this.bootstrapTelnetClient() // Linux
     // this.#bootstrapTelnetClient() // Windows
@@ -85,7 +86,7 @@ class TelnetStreamer extends BaseStreamer {
     socket.on('error', (err) => {
       console.error('Socket error:', err)
 
-      if (err.code === 'ECONNRESET') {
+      if (err.code === 'ECONNRESET' && this.counter < 5) {
         // exceptiong for when the socket is closed
         console.log('Socket error, waiting 2 seconds to reconnect...')
         setTimeout(() => {
@@ -94,6 +95,7 @@ class TelnetStreamer extends BaseStreamer {
             socket.write('%1POWR 1 ')
           })
         }, 2000)
+        this.counter++
       }
     })
 

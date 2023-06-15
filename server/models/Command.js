@@ -35,7 +35,7 @@ class Command {
 
   async invoke() {
     const { x, y, z } = this.data.position //switched x and y to match the total station
-
+    const start = Date.now()
     // Isues:
     // findings, without this points and anchors are added multiple times
     //remove all listeners to avoid duplicate listeners on the same event
@@ -65,6 +65,8 @@ class Command {
       // console.log("response code", responseCode)
 
       let next = localQueue.at(0)
+      let time = Math.floor((Date.now() - start) / 1000) 
+      console.log('time', time)
 
       if (!next) {
         return
@@ -90,6 +92,21 @@ class Command {
       }
 
       //exceptions
+      // connection is dropped sometimes on the total station and it looses socket connection
+      // if the time is greater than 30 seconds, then we should stop the stream and mark the command as invoked
+      // and try to reconnect
+
+      if (time > 30) {
+        
+        console.log('time is greater than 30 seconds, stop stream and mark command as invoked')
+        // this.streamer.send(TotalStationCommands.STOP_STREAM)
+        // this.#markAsInvoked()
+        this.streamer.connect()
+        
+        console.log('reconnect attempted')
+      }
+
+
       //what if reflector is not found? should this code invoke a true for the command?
       //currently runs and extra time before stopping
       if (responseCode !== '0') {
