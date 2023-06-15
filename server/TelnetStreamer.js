@@ -111,6 +111,26 @@ class TelnetStreamer extends BaseStreamer {
     this.socket.write(data)
     zeaDebug('Sent:', data)
   }
+  
+  runTimeOut() {
+    const start = Date.now()
+    let runTime = Math.floor((Date.now() - start) / 1000) 
+    console.log('time', time)
+
+    if (runTime > 100) {
+
+      console.log('time is greater than 30 seconds, stop stream and mark command as invoked')
+      // this.streamer.send(TotalStationCommands.STOP_STREAM)
+      // this.#markAsInvoked()
+      console.log('Reconnecting...')
+
+      socket.connect(this.params.port, this.params.host, () => {
+        socket.write('%1POWR 1 ')
+      })
+      
+      console.log('reconnect attempted')
+    }
+  }
 
   #handleData(data) {
     const decoded = data.toString('utf8').trim()
@@ -120,7 +140,9 @@ class TelnetStreamer extends BaseStreamer {
     const isStreamingResponse = decoded.startsWith(
       SURVEY_STREAMING_RESPONSE_PREFIX
     )
-
+    // if too much time has passed, reconnect
+    runTimeOut()
+    
     // A point looks like this:
     // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
 

@@ -33,9 +33,10 @@ class Command {
     this.data = data
   }
 
+
+
   async invoke() {
     const { x, y, z } = this.data.position //switched x and y to match the total station
-    const start = Date.now()
     // Isues:
     // findings, without this points and anchors are added multiple times
     //remove all listeners to avoid duplicate listeners on the same event
@@ -65,8 +66,7 @@ class Command {
       // console.log("response code", responseCode)
 
       let next = localQueue.at(0)
-      let time = Math.floor((Date.now() - start) / 1000) 
-      console.log('time', time)
+      
 
       if (!next) {
         return
@@ -96,15 +96,7 @@ class Command {
       // if the time is greater than 30 seconds, then we should stop the stream and mark the command as invoked
       // and try to reconnect
 
-      if (time > 30) {
-        
-        console.log('time is greater than 30 seconds, stop stream and mark command as invoked')
-        // this.streamer.send(TotalStationCommands.STOP_STREAM)
-        // this.#markAsInvoked()
-        this.streamer.connect()
-        
-        console.log('reconnect attempted')
-      }
+      
 
 
       //what if reflector is not found? should this code invoke a true for the command?
@@ -134,7 +126,7 @@ class Command {
         await this.#markAsInvoked()
         console.log(`POINT: ${point} \n ANCHOR : ${this.data.anchor} `)
         await this.session.addPoint(point, this.data.anchor)
-        console.log('----Command Complete----')
+        console.log('----Command queue Complete----')
         resolve()
       })
     })
