@@ -112,6 +112,27 @@ class TelnetStreamer extends BaseStreamer {
     zeaDebug('Sent:', data)
   }
   
+  
+
+  #handleData(data) {
+    const decoded = data.toString('utf8').trim()
+
+    zeaDebug('Received:', decoded)
+
+    const isStreamingResponse = decoded.startsWith(
+      SURVEY_STREAMING_RESPONSE_PREFIX
+    )
+    // if too much time has passed, reconnect
+    runTimeOut()
+
+    // A point looks like this:
+    // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
+
+    const eventType = isStreamingResponse ? 'streaming-response' : 'point'
+
+    this.emit(eventType, decoded)
+  }
+
   runTimeOut() {
     const start = Date.now()
     let runTime = Math.floor((Date.now() - start) / 1000) 
@@ -130,25 +151,6 @@ class TelnetStreamer extends BaseStreamer {
       
       console.log('reconnect attempted')
     }
-  }
-
-  #handleData(data) {
-    const decoded = data.toString('utf8').trim()
-
-    zeaDebug('Received:', decoded)
-
-    const isStreamingResponse = decoded.startsWith(
-      SURVEY_STREAMING_RESPONSE_PREFIX
-    )
-    // if too much time has passed, reconnect
-    runTimeOut()
-    
-    // A point looks like this:
-    // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
-
-    const eventType = isStreamingResponse ? 'streaming-response' : 'point'
-
-    this.emit(eventType, decoded)
   }
 }
 
