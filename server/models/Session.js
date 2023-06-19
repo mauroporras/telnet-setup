@@ -92,7 +92,7 @@ class Session {
       (snapshot) => {
         this.#latestSelectedAnchor =
          snapshot.data().latestSelectedAnchor || null
-         console.log("this.#latestSelectedAnchor ", this.#latestSelectedAnchor )
+         console.log("current anchor selected ", this.#latestSelectedAnchor )
        
       },
       (error) => {

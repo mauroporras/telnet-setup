@@ -10,14 +10,19 @@ class StreamerDbBridge {
     this.commandQueue = new CommandQueue()
   }
 
+  
+
   async start() {
     await this.streamer.connect()
     await this.session.init()
 
     this.session.onCommandCreated((data) => {
-      console.log('command created and added to queue')//, data)
+      this.streamer.socket.setTimeout(60000);
+      // console.log('setTimeout streamer object')
+
       const command = new Command(this.streamer, this.session, data)
       this.commandQueue.addCommand(command)
+      console.log('\n','command created and added to queue for anchor: ', data.anchor, '\n')//, data)
     })
 
     this.streamer.on('point', (point) => {
@@ -25,6 +30,41 @@ class StreamerDbBridge {
       console.log('start point', point)
       
       this.session.addPoint(point)
+    })
+
+    this.streamer.once('reset', () => {
+      console.log('--------------------------------restarting...--------------------------------')
+      setTimeout(() => {
+      // console.log('this.params.port, this.params.host', this.params.port, this.params.host)
+      // console.log('this.streamer', this.commandQueue)
+      this.commandQueue.clearCommandQueue()
+      // console.log('this.streamer after', this.commandQueue)
+      this.streamer.socket.end()
+      this.streamer.socket.destroy()
+      
+      this.start()
+      console.log('session reset')
+      }, 2000)
+    })
+
+    this.streamer.socket.once('timeout', () => {
+      // this.socket.setTimeout(60000); //https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback
+      console.log('socket timeout')
+      //try to reconnect
+      console.log('--------------------------------Reconnecting...--------------------------------')
+      // console.log('this.params.port, this.params.host', this.params.port, this.params.host)
+      // console.log('this.streamer', this.commandQueue)
+      this.commandQueue.clearCommandQueue()
+      // console.log('this.streamer after', this.commandQueue)
+      this.streamer.socket.end()
+      this.streamer.socket.destroy()
+      
+      this.start()
+      // this.streamer.socket.connect(this.params.port, this.params.host, () => {
+      //   this.streamer.socket.write('%1POWR 1 ')
+      // })
+
+      console.log('socket timeout end')
     })
   }
 }

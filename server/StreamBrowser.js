@@ -25,7 +25,7 @@ export const expressServer = (data) => {
   //   console.log(req)
   // })
 
-  console.log('data', data)
+  // console.log('data', data)
 
   app.use('/api/button', function (req, res) {
     console.log('api stream')

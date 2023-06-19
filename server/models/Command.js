@@ -14,6 +14,7 @@ const TotalStationResponses = {
   41: 'GRC_POSITIONING_FAILED',
 
   26: 'GRC_DIST_ERR',
+  28: 'Issue with reflector', //GRC_REFLECTOR_ERR cannot find reflector, happens only after at least one successful search
 
   // 30: 'GRC_NOT_OK',
   31: 'GRC_REFLECTOR_NOT_FOUND',
@@ -31,20 +32,24 @@ class Command {
     this.streamer = streamer
     this.session = session
     this.data = data
+    this.globalTimeout = 15
+    this.counterSetTimeout = 0
   }
-
-
 
   async invoke() {
     const { x, y, z } = this.data.position //switched x and y to match the total station
-    // Isues:
+
+    // Issues:
     // findings, without this points and anchors are added multiple times
     //remove all listeners to avoid duplicate listeners on the same event
     this.streamer.removeAllListeners('streaming-response')
     this.streamer.removeAllListeners('point')
+    // this.streamer.removeAllListeners('globalTimeout')
+    // this.streamer.removeAllListeners('timeout')
 
     // send a command to initialize the stream, then send the command to start the stream
     console.log('------------------ \n')
+    console.log('command invoked for anchor: ', this.data.anchor)
     // console.log("Stream started")
     this.streamer.send(TotalStationCommands.STOP_STREAM)
     this.streamer.send(TotalStationCommands.START_STREAM)
@@ -55,18 +60,55 @@ class Command {
       // TotalStationCommands.START_STREAM,
       TotalStationCommands.turnTelescope(y, x, z),
       TotalStationCommands.SEARCH,
-      //what if nothing is found? should this code invoke a true for the command? handled in the response code
       TotalStationCommands.SAMPLE_DIST,
     ]
 
-    // this.streamer.on('streaming-response', async (response) => { //NB
-    this.streamer.on('streaming-response', (response) => {
-      // console.log("response code", response)
+    this.streamer.on('streaming-response', async (response) => {
       const responseCode = response.substring(response.lastIndexOf(':') + 1)
-      // console.log("response code", responseCode)
 
+      // console.log(
+      //   'Start--TotalStation Response initial--',
+      //   TotalStationResponses[responseCode],
+      //   responseCode
+      // )
+
+      //exceptions
+      // connection is dropped sometimes on the total station and it looses socket connection
+      // if the time is greater than 30 seconds, then we should stop the stream and mark the command as invoked
+      // and try to reconnect
+      //what if reflector is not found? should this code invoke a true for the command?
+      //currently runs and extra time before stopping
+      if (responseCode !== '0') {
+        // server seems to hang on this error sometimes
+        if (responseCode == '28') {
+          console.log('response error', TotalStationResponses[responseCode])
+          this.#markAsInvoked()
+          console.log('for error 28, markAsInvoked ', this.data.anchor)
+          this.streamer.emit('reset')
+          return
+        }
+        if (responseCode == '31') {
+          console.log('response error', TotalStationResponses[responseCode])
+          this.#markAsInvoked()
+          this.streamer.emit('reset')
+          return
+        } else if (responseCode == '41') {
+          console.log('response error', TotalStationResponses[responseCode])
+          this.#markAsInvoked()
+          return
+        } else if (responseCode == '26') {
+          console.log('response error', TotalStationResponses[responseCode])
+          this.#markAsInvoked()
+          return
+        } else if (responseCode == '50') {
+          console.log('response error', TotalStationResponses[responseCode])
+          this.#markAsInvoked()
+          return
+        }
+      }
+
+      //Execute next command
       let next = localQueue.at(0)
-      
 
       if (!next) {
         return
@@ -80,53 +122,29 @@ class Command {
         }, 500)
       } else {
         console.log('command to  send', responseCode, next)
-        if (responseCode == '31') {
-          console.log('response error', TotalStationResponses[responseCode])
-          // this.streamer.send(TotalStationCommands.STOP_STREAM)
-          // mark command as invoked
-          this.#markAsInvoked()
-          return
-        }
+
         next = localQueue.shift()
         this.streamer.send(next)
       }
 
-      //exceptions
-      // connection is dropped sometimes on the total station and it looses socket connection
-      // if the time is greater than 30 seconds, then we should stop the stream and mark the command as invoked
-      // and try to reconnect
-
-      
-
-
-      //what if reflector is not found? should this code invoke a true for the command?
-      //currently runs and extra time before stopping
-      if (responseCode !== '0') {
-        if (responseCode == '31') {
-          console.log('response error', TotalStationResponses[responseCode])
-          // this.streamer.send(TotalStationCommands.STOP_STREAM)
-          // mark command as invoked
-
-          return
-        }
-        if (responseCode == '41') {
-          console.log('response error', TotalStationResponses[responseCode])
-          // this.streamer.send(TotalStationCommands.STOP_STREAM)
-          return
-        }
-      }
-      //notes on exceptions
-      //streaming app needs to be open
-      //no notifications can be active on the total station
-      // this.streamer.send(TotalStationCommands.STOP_STREAM)
+      // console.log(
+      //   'End----TotalStation Responses',
+      //   TotalStationResponses[responseCode]
+      // )
     })
 
     return new Promise(async (resolve) => {
-      this.streamer.on('point', async (point) => { //changed to .once from .on
+      this.streamer.on('point', async (point) => {
+        //changed to .once from .
+        this.streamer.socket.removeAllListeners('timeout')
+        this.streamer.socket.removeAllListeners('reset')
+
+        // console.log('----Time Out removed----')
         await this.#markAsInvoked()
-        console.log(`POINT: ${point} \n ANCHOR : ${this.data.anchor} `)
+        console.log(` ANCHOR : ${this.data.anchor}\n POINT : ${point} `)
         await this.session.addPoint(point, this.data.anchor)
-        console.log('----Command queue Complete----')
+        console.log('----Command Complete----')
+
         resolve()
       })
     })
@@ -135,6 +153,7 @@ class Command {
   async #markAsInvoked() {
     const docRef = db.collection('commands').doc(this.data.id)
     await docRef.update({ isInvoked: true })
+    // console.log('----Mark as Invoked----')
   }
 }
 

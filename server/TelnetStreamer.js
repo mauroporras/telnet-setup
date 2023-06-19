@@ -1,12 +1,12 @@
 import net from 'net'
-import Telnet from 'telnet-client'
+// import Telnet from 'telnet-client'
 // import util from 'util'
 import { zeaDebug } from './helpers/zeaDebug.js'
 import { BaseStreamer } from './BaseStreamer.js'
 import find from 'local-devices'
 //LuigiMacAddress = '00:17:17:06:8a:a5'
 //MarioMacAddress = '00:17:17:06:9f:ac'
-let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac'] //, '00:17:17:03:82:76'
+// let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac'] //, '00:17:17:03:82:76'
 
 const SURVEY_STREAMING_RESPONSE_PREFIX = '%R8P'
 
@@ -15,14 +15,18 @@ async function getIp() {
   var i = 0
   var notFound = true
   var found
+  var foundPrevious
 
   while (notFound) {
+    foundPrevious = found
     found = await find()
     console.log(
       `what did we find on network "${found.length}", max number pings "${i}"`
     )
     // console.log('what did we find', i, found.length, found)
-
+    if(foundPrevious){
+      if (found.length == foundPrevious.length) notFound = false
+    }
     if (i < 5 || found.length < 1) i++
     else notFound = false
   }
@@ -37,16 +41,14 @@ class TelnetStreamer extends BaseStreamer {
     this.params = params
     this.ipAddress = ''
     this.counter = 0
-
-    // this.bootstrapTelnetClient() // Linux
-    // this.#bootstrapTelnetClient() // Windows
+    this.GLOBAL_TIMEOUT = 5000 // 5 seconds
   }
 
   async connect() {
-    const params = {
-      shellPrompt: '',
-      ...this.params,
-    }
+    // const params = {
+    //   shellPrompt: '',
+    //   ...this.params,
+    // }
 
     const socket = new net.Socket()
     this.socket = socket
@@ -62,41 +64,61 @@ class TelnetStreamer extends BaseStreamer {
         this.params.stationNames
       )
       foundStationIP.forEach((each) => {
-        // if (each.mac.includes(LuigiMac[0]) || each.mac.includes(LuigiMac[1]) ) {
         if (each.mac.includes(this.params.stationMacs)) {
-          // console.log('LuigiMac', each.ip)
           ipToReturn = each.ip
-        } else {
-          console.log(
-            'No Station Mac Address found, did you select the right Multistation? Mario vs Luigi?'
-          )
         }
+        // else {
+        //   console.log(
+        //     'No Station Mac Address found, did you select the right Multistation? Mario vs Luigi?'
+        //   )
+        // }
       })
+      if (!ipToReturn) throw new Error('No IP found for that Mac address')
 
       console.log('Ip address found for that Mac address', ipToReturn)
 
       this.params.host = ipToReturn
     } catch {
       console.log('IP not found, restart server and try again')
+      return
     }
 
-    console.log('looking for something this.params.host', this.params.host)
-    console.log('------------------session streaming------------------')
+    console.log('here is the address found ', this.params.host)
+    console.log('\n------------------session streaming------------------')
 
     socket.on('error', (err) => {
       console.error('Socket error:', err)
 
       if (err.code === 'ECONNRESET' && this.counter < 5) {
         // exceptiong for when the socket is closed
-        console.log('Socket error, waiting 2 seconds to reconnect...')
+        console.log('Socket error -- ECONNRESET, waiting 2 seconds to reconnect...')
+        console.log('counter', this.counter)
         setTimeout(() => {
-          console.log('Reconnecting...')
-          socket.connect(this.params.port, this.params.host, () => {
-            socket.write('%1POWR 1 ')
-          })
-        }, 2000)
+          this.emit('restart')
+          // console.log('Reconnecting...')
+          // socket.end()
+          // socket.destroy()
+          // socket.connect(this.params.port, this.params.host, () => {
+          //   socket.write('%1POWR 1 ')
+          // })
+        }, 5000)
         this.counter++
       }
+      else if (err.code === 'EPIPE' && this.counter >= 5) {
+
+        console.log('Socket error -- EPIPE, waiting 2 seconds to reconnect...')
+        setTimeout(() => {
+          console.log('Reconnecting...')
+          this.emit('restart') 
+          // socket.end()
+          // socket.destroy()
+          // socket.connect(this.params.port, this.params.host, () => {
+          //   socket.write('%1POWR 1 ')
+          // })
+        }, 5000)
+        this.counter++
+      }
+
     })
 
     socket.on('data', this.#handleData.bind(this))
@@ -104,6 +126,7 @@ class TelnetStreamer extends BaseStreamer {
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
     })
+
   }
 
   send(data) {
@@ -111,45 +134,34 @@ class TelnetStreamer extends BaseStreamer {
     this.socket.write(data)
     zeaDebug('Sent:', data)
   }
-  
-  
 
   #handleData(data) {
     const decoded = data.toString('utf8').trim()
+
+    // console.log('what is the decoded data', decoded)
+    // need to add exception for when data is not a point and says "too many connections"
+    // if (decoded.includes('connection closed: too many clients')) {
+    //   console.log('Too many connections, waiting 2 seconds to reconnect...')
+    //   setTimeout(() => {
+    //     console.log('Reconnecting...')
+    //     this.socket.connect(this.params.port, this.params.host, () => {
+    //       this.socket.write('%1POWR 1 ')
+    //     })
+    //   }, 2000)
+    // }
+
 
     zeaDebug('Received:', decoded)
 
     const isStreamingResponse = decoded.startsWith(
       SURVEY_STREAMING_RESPONSE_PREFIX
     )
-    // if too much time has passed, reconnect
-    this.runTimeOut()
 
     // A point looks like this:
     // TS0012,410.9147,512.9075,103.3155,10/07/2020,18:53:02.68,16934825
 
     const eventType = isStreamingResponse ? 'streaming-response' : 'point'
-
     this.emit(eventType, decoded)
-  }
-
-  runTimeOut() {
-    const start = Date.now()
-    let runTime = Math.floor((Date.now() - start) / 1000) 
-
-    if (runTime > 100) {
-
-      console.log('time is greater than 30 seconds, stop stream and mark command as invoked')
-      // this.streamer.send(TotalStationCommands.STOP_STREAM)
-      // this.#markAsInvoked()
-      console.log('Reconnecting...')
-
-      socket.connect(this.params.port, this.params.host, () => {
-        socket.write('%1POWR 1 ')
-      })
-      
-      console.log('reconnect attempted')
-    }
   }
 }
 
