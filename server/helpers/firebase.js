@@ -18,6 +18,7 @@ import firebase from 'firebase-admin'
 //   client_x509_cert_url:
 //     'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-wne0q%40zahner-development.iam.gserviceaccount.com',
 // }
+
 const serviceAccount = {
   type: 'service_account',
   project_id: "zahner-production-8e2af",
@@ -39,7 +40,25 @@ firebase.initializeApp({
   databaseURL: `https://${process.env.GCP_PROJECT_ID}.firebaseio.com`,
 })
 
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCwm0Nex3W_jTBFZWAofXH7r4mTa3bdosw",
+//   authDomain: "zahner-production-8e2af.firebaseapp.com",
+//   projectId: "zahner-production-8e2af",
+//   storageBucket: "zahner-production-8e2af.appspot.com",
+//   messagingSenderId: "379521829525",
+//   appId: "1:379521829525:web:8e360f3265ebb300b6299c",
+//   measurementId: "G-9M6F508LJ7",
+
+// };
+
+// firebase.initializeApp(firebaseConfig)
+
+// firebase.analytics()
+
+// firebase.auth().signInAnonymously()
+
 const db = firebase.firestore()
+
 
 const { serverTimestamp } = firebase.firestore.FieldValue
 

@@ -94,7 +94,7 @@ class TelnetStreamer extends BaseStreamer {
         console.log('Socket error -- ECONNRESET, waiting 2 seconds to reconnect...')
         console.log('counter', this.counter)
         setTimeout(() => {
-          this.emit('restart')
+          this.emit('reset')
           // console.log('Reconnecting...')
           // socket.end()
           // socket.destroy()
@@ -109,7 +109,7 @@ class TelnetStreamer extends BaseStreamer {
         console.log('Socket error -- EPIPE, waiting 2 seconds to reconnect...')
         setTimeout(() => {
           console.log('Reconnecting...')
-          this.emit('restart') 
+          this.emit('reset') 
           // socket.end()
           // socket.destroy()
           // socket.connect(this.params.port, this.params.host, () => {

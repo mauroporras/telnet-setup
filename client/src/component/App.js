@@ -52,7 +52,7 @@ const App = () => {
         setButtonStatus(false)
       }
 
-    }, [buttonStatus,  sessioniDValue, stationiDValue]);//ipValue,
+    }, [buttonStatus,  sessioniDValue, stationiDValue, stationName]);//ipValue,
 
 
     console.log(data)
