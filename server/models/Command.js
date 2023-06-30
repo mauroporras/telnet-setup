@@ -44,6 +44,7 @@ class Command {
     //remove all listeners to avoid duplicate listeners on the same event
     this.streamer.removeAllListeners('streaming-response')
     this.streamer.removeAllListeners('point')
+    this.streamer.emit('timeout')
     // this.streamer.removeAllListeners('globalTimeout')
     // this.streamer.removeAllListeners('timeout')
 
@@ -126,18 +127,19 @@ class Command {
         next = localQueue.shift()
         this.streamer.send(next)
       }
-
-      // console.log(
-      //   'End----TotalStation Responses',
-      //   TotalStationResponses[responseCode]
-      // )
     })
+
+    //move removal of clear listeners to here to clean up 
+
+
+    this.streamer.socket.removeAllListeners('timeout')
+    this.streamer.socket.removeAllListeners('reset')
 
     return new Promise(async (resolve) => {
       this.streamer.on('point', async (point) => {
         //changed to .once from .
-        this.streamer.socket.removeAllListeners('timeout')
-        this.streamer.socket.removeAllListeners('reset')
+        // this.streamer.socket.removeAllListeners('timeout')
+        // this.streamer.socket.removeAllListeners('reset')
 
         // console.log('----Time Out removed----')
         await this.#markAsInvoked()
