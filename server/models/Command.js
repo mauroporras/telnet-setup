@@ -81,12 +81,15 @@ class Command {
       //currently runs and extra time before stopping
       if (responseCode !== '0') {
         // server seems to hang on this error sometimes
+        // console.log('response error', TotalStationResponses[responseCode])
         if (responseCode == '28') {
           console.log('response error', TotalStationResponses[responseCode])
-          this.#markAsInvoked()
+          // this.#markAsInvoked()
           console.log('for error 28, markAsInvoked ', this.data.anchor)
-          this.streamer.emit('reset')
+          // this.streamer.emit('reset')
+          this.streamer.emit('end')
           return
+          
         }
         if (responseCode == '31') {
           console.log('response error', TotalStationResponses[responseCode])
@@ -136,10 +139,25 @@ class Command {
     this.streamer.socket.removeAllListeners('reset')
 
     return new Promise(async (resolve) => {
+      this.streamer.on('end', async () => { 
+        console.log('end event')
+        // this.streamer.removeAllListeners('streaming-response')
+        await this.#markAsInvoked()
+        resolve()
+      })
+
       this.streamer.on('point', async (point) => {
         //changed to .once from .
         // this.streamer.socket.removeAllListeners('timeout')
         // this.streamer.socket.removeAllListeners('reset')
+
+        if(point == "connection closed: too many clients"){
+          console.log('reset: connection closed: too many clients')
+          setTimeout(() => {
+            this.emit('reset')
+            resolve()
+          }, 5000)
+        }
 
         // console.log('----Time Out removed----')
         await this.#markAsInvoked()

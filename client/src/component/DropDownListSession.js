@@ -30,12 +30,14 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
   const [documents, setDocuments] = useState([])
 
  
-
+  // DON"T FORGET TO CHANGE THE MAC ADDRESS FROM - TO :
   // let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac', '00:17:17:03:82:76']
+  // let LuigiMac = '00:17:17:06:8a:a5'//, 'Luigi'] 
   let LuigiMac = '00:17:17:06:8a:a5'//, 'Luigi']
-  let MarioMac = '00:17:17:06:9f:ac'//, 'Mario']
+  // let MarioMac = '00:17:17:06:9f:ac'//, 'Mario'] not correct after maint
+  let MarioMac = '08:00:28:12:03:58'//, 'Mario'] // post 230913 maint return
 
-  const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '00:17:17:06:9f:ac': 'Mario'}
+  const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '08:00:28:12:03:58': 'Mario'}
 
   const handleChangeSession = (event) => {
     console.log(

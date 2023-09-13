@@ -55,7 +55,9 @@ class TelnetStreamer extends BaseStreamer {
         this.params.stationNames
       )
       foundStationIP.forEach((each) => {
+        // console.log('each', each.mac, this.params.stationMacs)
         if (each.mac.includes(this.params.stationMacs)) {
+          // console.log('found mac', each.mac)
           ipToReturn = each.ip
         }
       })
