@@ -93,20 +93,24 @@ class Command {
         }
         if (responseCode == '31') {
           console.log('response error', TotalStationResponses[responseCode])
-          this.#markAsInvoked()
+          // this.#markAsInvoked()
+          this.streamer.emit('end')
           this.streamer.emit('reset')
           return
         } else if (responseCode == '41') {
           console.log('response error', TotalStationResponses[responseCode])
-          this.#markAsInvoked()
+          // this.#markAsInvoked()
+          this.streamer.emit('end')
           return
         } else if (responseCode == '26') {
           console.log('response error', TotalStationResponses[responseCode])
-          this.#markAsInvoked()
+          // this.#markAsInvoked()
+          this.streamer.emit('end')
           return
         } else if (responseCode == '50') {
           console.log('response error', TotalStationResponses[responseCode])
-          this.#markAsInvoked()
+          // this.#markAsInvoked()
+          this.streamer.emit('end')
           return
         }
       }
