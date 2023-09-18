@@ -81,7 +81,7 @@ class Command {
       //currently runs and extra time before stopping
       if (responseCode !== '0') {
         // server seems to hang on this error sometimes
-        // console.log('response error', TotalStationResponses[responseCode])
+        console.log('response error', TotalStationResponses[responseCode])
         if (responseCode == '28') {
           console.log('response error', TotalStationResponses[responseCode])
           // this.#markAsInvoked()
@@ -95,7 +95,7 @@ class Command {
           console.log('response error', TotalStationResponses[responseCode])
           // this.#markAsInvoked()
           this.streamer.emit('end')
-          this.streamer.emit('reset')
+          // this.streamer.emit('reset')
           return
         } else if (responseCode == '41') {
           console.log('response error', TotalStationResponses[responseCode])
@@ -143,6 +143,7 @@ class Command {
     this.streamer.socket.removeAllListeners('reset')
 
     return new Promise(async (resolve) => {
+      
       this.streamer.on('end', async () => { 
         console.log('end event')
         // this.streamer.removeAllListeners('streaming-response')
