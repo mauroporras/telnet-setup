@@ -41,6 +41,7 @@ class StreamerDbBridge {
       // console.log('this.streamer after', this.commandQueue)
       this.streamer.socket.end()
       this.streamer.socket.destroy()
+      
       this.start()
       console.log('session reset')
       }, 2000)
@@ -51,7 +52,6 @@ class StreamerDbBridge {
       console.log('socket timeout')
       //try to reconnect
       console.log('--------------------------------Reconnecting...--------------------------------')
-      setTimeout(() => {
       // console.log('this.params.port, this.params.host', this.params.port, this.params.host)
       // console.log('this.streamer', this.commandQueue)
       this.commandQueue.clearCommandQueue()
@@ -60,7 +60,10 @@ class StreamerDbBridge {
       this.streamer.socket.destroy()
       
       this.start()
-      }, 45000)
+      // this.streamer.socket.connect(this.params.port, this.params.host, () => {
+      //   this.streamer.socket.write('%1POWR 1 ')
+      // })
+
       console.log('socket timeout end')
     })
   }

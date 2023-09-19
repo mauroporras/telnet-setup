@@ -4,10 +4,14 @@ import net from 'net'
 import { zeaDebug } from './helpers/zeaDebug.js'
 import { BaseStreamer } from './BaseStreamer.js'
 import find from 'local-devices'
+//LuigiMacAddress = '00:17:17:06:8a:a5'
+//MarioMacAddress = '00:17:17:06:9f:ac'
+// let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac'] //, '00:17:17:03:82:76'
 
 const SURVEY_STREAMING_RESPONSE_PREFIX = '%R8P'
 
 async function getIp() {
+  //find().then(devices => { console.log('found the IP in the promise', devices)
   var i = 0
   var notFound = true
   var found
@@ -20,7 +24,7 @@ async function getIp() {
       `what did we find on network "${found.length}", max number pings "${i}"`
     )
     // console.log('what did we find', i, found.length, found)
-    if (foundPrevious) {
+    if(foundPrevious){
       if (found.length == foundPrevious.length) notFound = false
     }
     if (i < 5 || found.length < 1) i++
@@ -41,6 +45,11 @@ class TelnetStreamer extends BaseStreamer {
   }
 
   async connect() {
+    // const params = {
+    //   shellPrompt: '',
+    //   ...this.params,
+    // }
+
     const socket = new net.Socket()
     this.socket = socket
     const foundStationIP = await getIp()
@@ -60,6 +69,11 @@ class TelnetStreamer extends BaseStreamer {
           // console.log('found mac', each.mac)
           ipToReturn = each.ip
         }
+        // else {
+        //   console.log(
+        //     'No Station Mac Address found, did you select the right Multistation? Mario vs Luigi?'
+        //   )
+        // }
       })
       if (!ipToReturn) throw new Error('No IP found for that Mac address')
 
@@ -79,22 +93,34 @@ class TelnetStreamer extends BaseStreamer {
 
       if (err.code === 'ECONNRESET' && this.counter < 5) {
         // exceptiong for when the socket is closed
-        console.log(
-          'Socket error -- ECONNRESET, waiting 2 seconds to reconnect...'
-        )
+        console.log('Socket error -- ECONNRESET, waiting 2 seconds to reconnect...')
         console.log('counter', this.counter)
         setTimeout(() => {
           this.emit('reset')
-        }, 5000)
-        this.counter++
-      } else if (err.code === 'EPIPE' && this.counter >= 5) {
-        console.log('Socket error -- EPIPE, waiting 2 seconds to reconnect...')
-        setTimeout(() => {
-          console.log('Reconnecting...')
-          this.emit('reset')
+          // console.log('Reconnecting...')
+          // socket.end()
+          // socket.destroy()
+          // socket.connect(this.params.port, this.params.host, () => {
+          //   socket.write('%1POWR 1 ')
+          // })
         }, 5000)
         this.counter++
       }
+      else if (err.code === 'EPIPE' && this.counter >= 5) {
+
+        console.log('Socket error -- EPIPE, waiting 2 seconds to reconnect...')
+        setTimeout(() => {
+          console.log('Reconnecting...')
+          this.emit('reset') 
+          // socket.end()
+          // socket.destroy()
+          // socket.connect(this.params.port, this.params.host, () => {
+          //   socket.write('%1POWR 1 ')
+          // })
+        }, 5000)
+        this.counter++
+      }
+
     })
 
     socket.on('data', this.#handleData.bind(this))
@@ -102,6 +128,7 @@ class TelnetStreamer extends BaseStreamer {
     socket.connect(this.params.port, this.params.host, () => {
       socket.write('%1POWR 1 ')
     })
+
   }
 
   send(data) {
@@ -112,6 +139,19 @@ class TelnetStreamer extends BaseStreamer {
 
   #handleData(data) {
     const decoded = data.toString('utf8').trim()
+
+    // console.log('what is the decoded data', decoded)
+    // need to add exception for when data is not a point and says "too many connections"
+    // if (decoded.includes('connection closed: too many clients')) {
+    //   console.log('Too many connections, waiting 2 seconds to reconnect...')
+    //   setTimeout(() => {
+    //     console.log('Reconnecting...')
+    //     this.socket.connect(this.params.port, this.params.host, () => {
+    //       this.socket.write('%1POWR 1 ')
+    //     })
+    //   }, 2000)
+    // }
+
 
     zeaDebug('Received:', decoded)
 

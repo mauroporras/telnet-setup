@@ -44,7 +44,6 @@ class Command {
     //remove all listeners to avoid duplicate listeners on the same event
     this.streamer.removeAllListeners('streaming-response')
     this.streamer.removeAllListeners('point')
-    this.streamer.emit('timeout')
     // this.streamer.removeAllListeners('globalTimeout')
     // this.streamer.removeAllListeners('timeout')
 
@@ -134,13 +133,12 @@ class Command {
         next = localQueue.shift()
         this.streamer.send(next)
       }
+
+      // console.log(
+      //   'End----TotalStation Responses',
+      //   TotalStationResponses[responseCode]
+      // )
     })
-
-    //move removal of clear listeners to here to clean up 
-
-
-    this.streamer.socket.removeAllListeners('timeout')
-    this.streamer.socket.removeAllListeners('reset')
 
     return new Promise(async (resolve) => {
       
@@ -153,8 +151,8 @@ class Command {
 
       this.streamer.on('point', async (point) => {
         //changed to .once from .
-        // this.streamer.socket.removeAllListeners('timeout')
-        // this.streamer.socket.removeAllListeners('reset')
+        this.streamer.socket.removeAllListeners('timeout')
+        this.streamer.socket.removeAllListeners('reset')
 
         if(point == "connection closed: too many clients"){
           console.log('reset: connection closed: too many clients')
