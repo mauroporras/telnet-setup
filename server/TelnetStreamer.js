@@ -4,6 +4,7 @@ import net from 'net'
 import { zeaDebug } from './helpers/zeaDebug.js'
 import { BaseStreamer } from './BaseStreamer.js'
 import find from 'local-devices'
+import hello from './helpers/hello.js'
 //LuigiMacAddress = '00:17:17:06:8a:a5'
 //MarioMacAddress = '00:17:17:06:9f:ac'
 // let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac'] //, '00:17:17:03:82:76'
@@ -42,7 +43,7 @@ class TelnetStreamer extends BaseStreamer {
     this.ipAddress = ''
     this.counter = 0
     this.close = false
-    this.GLOBAL_TIMEOUT = 5000 // 5 seconds
+    this.GLOBAL_TIMEOUT = 10000 // 5 seconds
   }
 
   async connect() {
@@ -87,6 +88,9 @@ class TelnetStreamer extends BaseStreamer {
     }
 
     console.log('here is the address found ', this.params.host)
+
+    console.log('\n')
+    hello()
     console.log('\n------------------session streaming------------------')
 
     socket.on('error', (err) => {
