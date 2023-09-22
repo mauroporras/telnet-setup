@@ -9,3 +9,6 @@ cd "$REPO_FOLDER"
 # Pull the latest changes from GitHub
 git pull
 
+echo "update complete - review for errors"
+
+sleep 5

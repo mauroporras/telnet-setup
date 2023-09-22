@@ -1,4 +1,4 @@
-export default printStart = () => {
+const printStart = () => {
     const consoleOptions = 'background: #ffffff; color: #6b17e8';
     // Standard Figlet Font
     console.log("Running Version: ", "1.0.1", '\n')
@@ -16,3 +16,6 @@ export default printStart = () => {
   
    
   }
+
+
+  export { printStart }
