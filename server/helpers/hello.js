@@ -18,4 +18,4 @@ const printStart = () => {
   }
 
 
-  export { printStart }
+  export default { printStart }
