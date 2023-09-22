@@ -6,8 +6,14 @@ REPO_FOLDER="./git/telnet-setup/"
 # Change directory to the repository folder
 cd "$REPO_FOLDER"
 
+git add .
+
+git stash
+
 # Pull the latest changes from GitHub
 git pull
+
+git stash pop
 
 echo "update complete - review for errors"
 
