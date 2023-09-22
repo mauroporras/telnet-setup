@@ -17,8 +17,12 @@ class StreamerDbBridge {
     await this.session.init()
 
     this.session.onCommandCreated((data) => {
-      this.streamer.socket.setTimeout(60000);
-      console.log('setTimeout streamer object')
+      // this.streamer.socket.setTimeout(60000);
+      //need to actually set a timeout event here for the socket
+      // console.log('setTimeout streamer object', this.streamer)
+      this.streamer.emit('timeout')
+
+      console.log('setTimeout 45 seconds streamer object')
 
       const command = new Command(this.streamer, this.session, data)
       this.commandQueue.addCommand(command)
