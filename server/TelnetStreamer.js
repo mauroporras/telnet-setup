@@ -41,6 +41,7 @@ class TelnetStreamer extends BaseStreamer {
     this.params = params
     this.ipAddress = ''
     this.counter = 0
+    this.close = false
     this.GLOBAL_TIMEOUT = 5000 // 5 seconds
   }
 
@@ -119,6 +120,16 @@ class TelnetStreamer extends BaseStreamer {
           // })
         }, 5000)
         this.counter++
+      }
+      else if (this.close === false && this.counter >= 5) {
+
+        setTimeout(() => {
+          console.log('Reconnecting...')
+          this.emit('reset') 
+
+        }, 5000)
+        this.counter++
+        this.close = true
       }
 
     })
