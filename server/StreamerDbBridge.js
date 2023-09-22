@@ -18,7 +18,7 @@ class StreamerDbBridge {
 
     this.session.onCommandCreated((data) => {
       this.streamer.socket.setTimeout(60000);
-      // console.log('setTimeout streamer object')
+      console.log('setTimeout streamer object')
 
       const command = new Command(this.streamer, this.session, data)
       this.commandQueue.addCommand(command)
@@ -43,7 +43,7 @@ class StreamerDbBridge {
       this.streamer.socket.destroy()
       
       this.start()
-      console.log('session reset')
+      console.log('session reset', this)
       }, 2000)
     })
 
@@ -60,12 +60,9 @@ class StreamerDbBridge {
       this.streamer.socket.destroy()
       
       this.start()
-      // this.streamer.socket.connect(this.params.port, this.params.host, () => {
-      //   this.streamer.socket.write('%1POWR 1 ')
-      // })
-
-      console.log('socket timeout end')
-    })
+      }, 45000)
+      console.log('socket timeout end', this)
+    // })
   }
 }
 

@@ -103,7 +103,7 @@ class TelnetStreamer extends BaseStreamer {
           // socket.connect(this.params.port, this.params.host, () => {
           //   socket.write('%1POWR 1 ')
           // })
-        }, 5000)
+        }, 2000)
         this.counter++
       }
       else if (err.code === 'EPIPE' && this.counter >= 5) {
