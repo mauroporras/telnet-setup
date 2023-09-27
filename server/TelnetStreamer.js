@@ -28,7 +28,7 @@ async function getIp() {
     if(foundPrevious){
       if (found.length == foundPrevious.length) notFound = false
     }
-    if (i < 5 || found.length < 1) i++
+    if (i < 5 || found.length < 2) i++
     else notFound = false
   }
 
