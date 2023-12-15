@@ -36,8 +36,9 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
   let LuigiMac = '00:17:17:06:8a:a5'//, 'Luigi']
   // let MarioMac = '00:17:17:06:9f:ac'//, 'Mario'] not correct after maint
   let MarioMac = '08:00:28:12:03:58'//, 'Mario'] // post 230913 maint return
+  let PrincessPeachMac = '00:17:17:07:84:ed'
 
-  const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '08:00:28:12:03:58': 'Mario'}
+  const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '08:00:28:12:03:58': 'Mario', '00:17:17:07:84:ed': 'Princess Peach'}
 
   const handleChangeSession = (event) => {
     console.log(
@@ -107,6 +108,7 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
           >
             <MenuItem name="Luigi" value={LuigiMac} id="long-menu">Luigi</MenuItem>
             <MenuItem name="Mario" value={MarioMac} id="long-menu">Mario</MenuItem>
+            <MenuItem name="PrincessPeach" value={PrincessPeachMac} id="long-menu">Princess Peach</MenuItem>
           </Select>
         </FormControl>
 
