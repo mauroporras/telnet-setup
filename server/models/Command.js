@@ -166,6 +166,7 @@ class Command {
         await this.#markAsInvoked()
         console.log(` ANCHOR : ${this.data.anchor}\n POINT : ${point} `)
         await this.session.addPoint(point, this.data.anchor)
+        //Write to CSV Point data to IMU
         console.log('----Command Complete----')
 
         resolve()
