@@ -65,7 +65,7 @@ class StreamerDbBridge {
       
       this.start()
       }, 45000)
-      console.log('socket timeout end')
+      // console.log('socket timeout end')
       // console.log('socket timeout end', this)
     // })
   }

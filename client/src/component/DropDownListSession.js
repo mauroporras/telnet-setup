@@ -27,18 +27,23 @@ async function helpAwait() {
 export default  function BasicSelect({ setSessionIDValue, setStationIDValue, setStationName }) {
   const [sessionID, setsessionID] = useState('')
   const [station, setStation] = useState('')
+  const [connectionType, setConnectionType] = useState(0)
   const [documents, setDocuments] = useState([])
 
  
   // DON"T FORGET TO CHANGE THE MAC ADDRESS FROM - TO :
-  // let LuigiMac = ['00:17:17:06:8a:a5', '00:17:17:06:9f:ac', '00:17:17:03:82:76']
-  // let LuigiMac = '00:17:17:06:8a:a5'//, 'Luigi'] 
-  let LuigiMac = '00:17:17:06:8a:a5'//, 'Luigi']
-  // let MarioMac = '00:17:17:06:9f:ac'//, 'Mario'] not correct after maint
-  let MarioMac = '08:00:28:12:03:58'//, 'Mario'] // post 230913 maint return
-  let PrincessPeachMac = '00:17:17:07:84:ed'
+  // let LuigiMac = '00:17:17:06:8a:a5'//, 'Luigi']
+  // let MarioMac = '08:00:28:12:03:58'//, 'Mario'] // post 230913 maint return
+  // let PrincessPeachMac = '02:24:00:00:00:00'
+  // let PrincessPeachMacWifi = '00:17:17:07:84:ed'
 
-  const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '08:00:28:12:03:58': 'Mario', '00:17:17:07:84:ed': 'Princess Peach'}
+  const LuigiMac = connectionType === 0 ? '00:17:17:06:8a:a5' : 'UsbMacForLuigi'; // 0 is wifi, 1 is usb
+  const MarioMac = connectionType === 0 ? '08:00:28:12:03:58' : 'UsbMacForMario';
+  const PrincessPeachMac = connectionType === 0 ? '00:17:17:07:84:ed' : '02:24:00:00:00:00';
+
+
+  const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '08:00:28:12:03:58': 'Mario', '00:17:17:07:84:ed': 'Princess Peach', '02:24:00:00:00:00': 'Princess Peach'}
+  // const lookupValue = {'00:17:17:06:8a:a5': 'Luigi', '08:00:28:12:03:58': 'Mario', '00:17:17:07:84:ed': 'Princess Peach'}
 
   const handleChangeSession = (event) => {
     console.log(
@@ -57,6 +62,13 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
     setStationName(lookupValue[event.target.value])
   }
 
+  const handleChangeConnectionType = (event) => {
+    // const { myValue } = event.currentTarget;
+
+    setConnectionType(event.target.value);
+    setStation(''); // reset the station when connection type changes
+  }
+
   useEffect(() => {
     helpAwait().then(result => {
       if (result) {
@@ -66,21 +78,6 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
     });
   }, []);
 
-  // let sessionItems 
-
-
-  // useEffect(() => {
-  //   console.log("documents length", documents)
-  //   // if (documents){
-  //     sessionItems = documents.map((doc) => (
-  //       <div style={{height: '250px !important'}}>
-  //         <MenuItem key={doc.id} value={doc.id}>
-  //           {doc.name}
-  //         </MenuItem>
-  //       </div>
-  //     ))
-  //   // }
-  //   }, [documents])
 
 
 
@@ -95,9 +92,29 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
 
 
   return (
-    <div style={{ marginTop: '10%' }}>
-      <Box sx={{ minWidth: 120 }}>
-        <FormControl fullWidth>
+    <div style={{ margin: '10%' }}>
+      <Box sx={{ minWidth: 300, padding: '30px' }} style={{ border: '1px solid grey' }}>
+
+      <FormControl fullWidth style={{ margin: '10px' }}>
+          <InputLabel id="select-Connection">Connection Type </InputLabel>
+          <Select
+            labelId="select-Connection"
+            id="selectConnection"
+            value={connectionType}
+            label="connectionType"
+            onChange={handleChangeConnectionType}
+          >
+
+            <MenuItem name="WifiMac" value={0} id="long-menu">Wifi</MenuItem>
+            <MenuItem name="usbMac" value={1} id="long-menu">USB</MenuItem>
+            
+          </Select>
+        </FormControl>
+
+        <br />
+        <br />
+
+        <FormControl fullWidth style={{ margin: '10px' }}>
           <InputLabel id="demo-simple-select-label">Multistation </InputLabel>
           <Select
             labelId="demo-simple-select-label"
@@ -109,13 +126,14 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
             <MenuItem name="Luigi" value={LuigiMac} id="long-menu">Luigi</MenuItem>
             <MenuItem name="Mario" value={MarioMac} id="long-menu">Mario</MenuItem>
             <MenuItem name="PrincessPeach" value={PrincessPeachMac} id="long-menu">Princess Peach</MenuItem>
+
           </Select>
         </FormControl>
 
         <br />
         <br />
 
-        <FormControl fullWidth>
+        <FormControl fullWidth style={{ margin: '10px' }}>
           <InputLabel id="select-session-label">Session ID </InputLabel>
           <Select
             labelId="select-session-label"
