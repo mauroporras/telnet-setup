@@ -2,6 +2,15 @@
 import { db, serverTimestamp } from '../helpers/firebase.js'
 import { zeaDebug } from '../helpers/zeaDebug.js'
 
+// const fs = require('fs');
+// const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 class Session {
   #latestSelectedAnchor
@@ -35,7 +44,7 @@ class Session {
 
     const docRef = db.collection('points').doc()
     const { id } = docRef
-
+    
     const data = {
       id,
       createdAt: serverTimestamp(),
@@ -43,6 +52,16 @@ class Session {
       anchor: theAnchor,
       string: point,
     }
+
+      // Convert the data object to a CSV string
+      const csvData = Object.values(data).join(',') + '\n';
+
+      // Append the CSV data to the file
+      fs.appendFile(path.join(process.cwd(), 'points.csv'), csvData, (err) => {
+        if (err) throw err;
+        console.log('The "data to append" was appended to file!');
+      });
+
     // console.log('data :', data)
     await docRef.set(data)
 

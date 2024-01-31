@@ -21,6 +21,7 @@ async function getIp() {
   while (notFound) {
     foundPrevious = found
     found = await find()
+    console.log('found', found)
     console.log(
       `what did we find on network "${found.length}", max number pings "${i}"`
     )
