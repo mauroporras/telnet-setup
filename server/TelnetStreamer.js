@@ -83,6 +83,10 @@ class TelnetStreamer extends BaseStreamer {
       console.log('Ip address found for that Mac address', ipToReturn)
 
       this.params.host = ipToReturn
+
+      
+      // this.params.host = '/dev/ttyUSB0'
+      
     } catch {
       console.log('IP not found, restart server and try again')
       return

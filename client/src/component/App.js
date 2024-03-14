@@ -66,18 +66,17 @@ const App = () => {
 
 
   return (
-    <div className='ui container grid' style={{maxWidth: "320px"}}>
-      <div className='ui row'>
-        {/*<div className='column eight wide'>
-          <DropDownList setIpValue={setIpValue}/>
-        </div>*/}
-        <div className='column eight wide' >
-            {/* <div style={{marginTop: "5%"}}>
-                - IP Address
-            </div> */}
-          
+    <div className='ui container grid' style={{maxWidth: "400px"}}>
+
+        <div className='ui row' style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className='column eight wide' style={{ marginRight: '50px' }}>
+            <DropDownListSession setSessionIDValue={setSessionIDValue} setStationIDValue={setStationIDValue} setStationName={setStationName}/>
+          </div>
+          <div className='column eight wide' style={{ display: 'flex', justifyContent: 'center',  marginTop: '50px',  marginBottom: '50px'  }}>
+            <ButtonStart setButtonStatus={setButtonStatus}/>
+          </div>
         </div>
-      </div>
+      {/* </div>
       <div className='ui row'>
         <div className='column eight wide'>
           <DropDownListSession setSessionIDValue={setSessionIDValue} setStationIDValue={setStationIDValue} setStationName={setStationName}/>
@@ -85,7 +84,7 @@ const App = () => {
         <div className='column eight wide' >
             {/* <div style={{marginTop: "5%"}}>
                 - Session ID
-            </div> */}
+            </div>
          
         </div>
       </div>
@@ -96,7 +95,7 @@ const App = () => {
           <ButtonStart  setButtonStatus={setButtonStatus}/>
         </div>
         
-      </div>
+      </div> */}
       {/* <div className='ui row'>
         <div className='column eight wide'>
           <OutPut data={!data ? "" : data}/>

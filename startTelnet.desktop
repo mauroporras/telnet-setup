@@ -2,7 +2,7 @@
 [Desktop Entry]
 Name=startServer script
 Comment=Starts an AS400 session
-Exec=bash -c /home/pi/git/telnet-setup/Z_LaunchServer.sh
+Exec=bash -c /home/pi/git/telnet-setup/Z_LaunchServerAll.sh
 Terminal=true
 Type=Application
 StartupNotify=false
