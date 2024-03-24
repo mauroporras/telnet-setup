@@ -4,31 +4,30 @@ import { StreamerDbBridge } from './src/StreamerDbBridge.js'
 
 import { Session } from './src/models/Session.js'
 
-const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE || ''
-const ZEA_SESSION_ID = process.env.ZEA_SESSION_ID || ''
+const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE
+const ZEA_SESSION_ID = process.env.ZEA_SESSION_ID
+const ZEA_TEST_POINTS_FILE = process.env.ZEA_TEST_POINTS_FILE
 
-// console.log(
-//   'session ',
-//   ZEA_STREAMER_TYPE.length,
-//   'mock'.length,
-//   ZEA_STREAMER_TYPE === 'mock'
-// )
-// console.log('session ', ZEA_SESSION_ID)
+if (!ZEA_STREAMER_TYPE) {
+  throw Error('Missing "ZEA_STREAMER_TYPE" env var.')
+}
 
-// const shouldUseMock = process.env.ZEA_STREAMER_TYPE === 'mock' ? true : false
-const shouldUseMock = ZEA_STREAMER_TYPE === 'mock' ? true : false
-// console.log('status ', shouldUseMock)
+if (!ZEA_SESSION_ID) {
+  throw Error('Missing "ZEA_SESSION_ID" env var.')
+}
 
-const ZEA_TEST_POINTS_FILE =
-  '/Users/maure/workspace/zahner/telnet-setup/assets/mock-points.txt'
+if (!ZEA_TEST_POINTS_FILE) {
+  throw Error('Missing "ZEA_TEST_POINTS_FILE" env var.')
+}
+
+const shouldUseMock = ZEA_STREAMER_TYPE === 'mock'
 
 const streamer = shouldUseMock
   ? new MockStreamer(ZEA_TEST_POINTS_FILE)
   : new TelnetStreamer(process.env.ZEA_TELNET_HOST, process.env.ZEA_TELNET_PORT)
 
-const sessionId = ZEA_SESSION_ID
-
-const session = new Session(sessionId)
+const session = new Session(ZEA_SESSION_ID)
 
 const streamerDbBridge = new StreamerDbBridge(streamer, session)
+
 await streamerDbBridge.start()

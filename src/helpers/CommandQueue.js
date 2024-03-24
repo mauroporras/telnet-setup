@@ -3,7 +3,7 @@ class CommandQueue {
   isInProgress = false
 
   addCommand(command) {
-    this.queue.unshift(command)
+    this.queue.push(command)
 
     if (this.isInProgress) {
       return
@@ -15,7 +15,7 @@ class CommandQueue {
   #consumeCommand() {
     this.isInProgress = true
 
-    const command = this.queue.pop()
+    const command = this.queue.shift()
 
     command.invoke().then(() => {
       this.isInProgress = false
