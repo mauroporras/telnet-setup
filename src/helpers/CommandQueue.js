@@ -4,27 +4,21 @@ class CommandQueue {
 
   addCommand(command) {
     this.queue.push(command)
+    this.#processQueue()
+  }
 
-    if (this.isInProgress) {
+  #processQueue() {
+    if (this.isInProgress || !this.queue.length) {
       return
     }
 
-    this.#consumeCommand()
-  }
-
-  #consumeCommand() {
     this.isInProgress = true
 
     const command = this.queue.shift()
 
     command.invoke().then(() => {
       this.isInProgress = false
-
-      if (this.queue.length === 0) {
-        return
-      }
-
-      this.#consumeCommand()
+      this.#processQueue()
     })
   }
 }

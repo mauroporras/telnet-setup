@@ -13,15 +13,15 @@ class StreamerDbBridge {
     await this.session.init()
 
     this.session.onCommandCreated((data) => {
-      console.log('command created')//, data)
       const command = new Command(this.streamer, this.session, data)
       this.commandQueue.addCommand(command)
     })
 
-    this.streamer.once('point', (point) => { //on ->once
-      if(this.commandQueue.isInProgress) return
-      console.log('start point', point)
-      
+    this.streamer.on('point', (point) => {
+      if (this.commandQueue.isInProgress) {
+        return
+      }
+
       this.session.addPoint(point)
     })
   }
