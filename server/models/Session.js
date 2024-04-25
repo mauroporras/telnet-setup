@@ -4,8 +4,8 @@ import { zeaDebug } from '../helpers/zeaDebug.js'
 
 // const fs = require('fs');
 // const path = require('path');
-import fs from 'fs';
-import path from 'path';
+// import fs from 'fs';
+// import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -53,14 +53,14 @@ class Session {
       string: point,
     }
 
-      // Convert the data object to a CSV string
-      const csvData = Object.values(data).join(',') + '\n';
+      // // Convert the data object to a CSV string
+      // const csvData = Object.values(data).join(',') + '\n';
 
-      // Append the CSV data to the file
-      fs.appendFile(path.join(process.cwd(), 'points.csv'), csvData, (err) => {
-        if (err) throw err;
-        console.log('The "data to append" was appended to file!');
-      });
+      // // Append the CSV data to the file
+      // fs.appendFile(path.join(process.cwd(), 'points.csv'), csvData, (err) => {
+      //   if (err) throw err;
+      //   console.log('The "data to append" was appended to file!');
+      // });
 
     // console.log('data :', data)
     await docRef.set(data)
