@@ -37,8 +37,8 @@ export default  function BasicSelect({ setSessionIDValue, setStationIDValue, set
   // let PrincessPeachMac = '02:24:00:00:00:00'
   // let PrincessPeachMacWifi = '00:17:17:07:84:ed'
 
-  const LuigiMac = connectionType === 0 ? '00:17:17:06:8a:a5' : 'UsbMacForLuigi'; // 0 is wifi, 1 is usb
-  const MarioMac = connectionType === 0 ? '08:00:28:12:03:58' : 'UsbMacForMario';
+  const LuigiMac = connectionType === 0 ? '00:17:17:06:8a:a5' : '02:24:00:00:00:00'; // 0 is wifi, 1 is usb
+  const MarioMac = connectionType === 0 ? '08:00:28:12:03:58' : '02:24:00:00:00:00';
   const PrincessPeachMac = connectionType === 0 ? '00:17:17:07:84:ed' : '02:24:00:00:00:00';
 
 
