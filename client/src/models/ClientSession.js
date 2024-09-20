@@ -10,10 +10,17 @@
 
 import { initializeApp } from 'firebase/app';
 // import { getFirestore} from 'firebase/firestore/lite';
-// import firebase from 'firebase/compat/app';
+import firebase from 'firebase/compat/app';
 // import firebase from 'firebase/app';
 // import 'firebase/firestore';
-import { collection, getDocs, getFirestore, orderBy, query } from "firebase/firestore"; 
+// import { collection, getDocs, getFirestore, orderBy, query } from "firebase/firestore"; 
+import 'firebase/compat/database';
+import 'firebase/compat/auth';
+import { getFirestore, collection, getDocs, orderBy, query } from 'firebase/firestore'; // Import missing Firestore functions
+//V8
+// import firebase from 'firebase/compat/app'
+import 'firebase/compat/database'
+import 'firebase/compat/auth'
 
 // import serviceAccount from './firebase_service_account_key.json' //assert { type: 'json' }
 //import serviceAccount from '../../firebase_service_account_key.json';
@@ -38,16 +45,24 @@ class ClientSession {
 
   // async #observeSession() {
   async observeSession() {
-
     const firebaseConfig = {
-      apiKey: "AIzaSyCwm0Nex3W_jTBFZWAofXH7r4mTa3bdosw",
-      authDomain: "zahner-production-8e2af.firebaseapp.com",
-      projectId: "zahner-production-8e2af",
-      storageBucket: "zahner-production-8e2af.appspot.com",
-      messagingSenderId: "379521829525",
-      appId: "1:379521829525:web:ca6517410571680ab6299c",
-      measurementId: "G-7X3BB5E4MG"
+      apiKey: "AIzaSyCIoL9RlD15JzJo1XDPBzTm1xR6StBUaxI",
+      authDomain: "csc-surveylink.firebaseapp.com",
+      projectId: "csc-surveylink",
+      storageBucket: "csc-surveylink.appspot.com",
+      messagingSenderId: "473701857342",
+      appId: "1:473701857342:web:73573aa5b8fc7db50b396f",
+      measurementId: "G-71DM2KZP94"
     };
+    // const firebaseConfig = {
+    //   apiKey: "AIzaSyCwm0Nex3W_jTBFZWAofXH7r4mTa3bdosw",
+    //   authDomain: "zahner-production-8e2af.firebaseapp.com",
+    //   projectId: "zahner-production-8e2af",
+    //   storageBucket: "zahner-production-8e2af.appspot.com",
+    //   messagingSenderId: "379521829525",
+    //   appId: "1:379521829525:web:ca6517410571680ab6299c",
+    //   measurementId: "G-7X3BB5E4MG"
+    // };
 
     // const firebaseConfig = {
     //   apiKey: "AIzaSyDhrTyj2hISapfNqAyGEEb5p2s47wi9_mA",
@@ -72,7 +87,7 @@ class ClientSession {
     const querySnapshot = await getDocs(dbGrab);
 
     const docs = []
-     querySnapshot.forEach((doc) => {
+    querySnapshot.forEach((doc) => {
       
       docs.push({ id: doc.id, ...doc.data() });
       // console.log(`${doc.id} => ${doc.data()}`);

@@ -19,21 +19,38 @@ import firebase from 'firebase-admin'
 //     'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-wne0q%40zahner-development.iam.gserviceaccount.com',
 // }
 
-const serviceAccount = {
-  type: 'service_account',
-  project_id: "zahner-production-8e2af",
-  private_key_id: "71621f0ad5a838b9d0ae88d69a5066e743c5fa5a",
-  private_key:
-    '-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDGoaeDDH9i1M+/\nP/aghXd0TMmuPuLu9IWqNyrmeTbbgEL0RDt8j7HtFrjo+w2MbKeDHPiCQSqGJ7iz\nkgQ1S81/IKm3dMGutJixESKDsnHZzncaBfAe5ijtgat/FA6B7GiyeehV5t3EKQ/X\nimxZg4t14riA6/GYZPVrchVRNRhsTGHVirnI9TtfqqcjSg1cVfdFg62+vzAIyj8B\nudFivo9t/ZbIoJ+x4Lz0ByPDyJMm7uehVYRYbzDKeDi0FjvV9rs0j7ya7JR9sLfT\nriAiKoCft98/89p2YTHOULJRG1Jep9Q9kuHS4wT4RLXcS+wdGuBjLKqTUf93/4uV\nFJTmovCpAgMBAAECggEACezadLUraVoWbmlJDtDUfPp4Sm1ohAWyZyS+D0mnyNSS\nI+gD6++3NZBg2X1v+iAUx7urHEEa2ZzDATAO50XcJRnR+TGLmwn5pkFjrt58C2Ti\ndSmuS7D3AxUrZ1xudCYGvkJSrnYshyiBGuVXECr/TTrwurpvdky3KbEH6SikyYZ6\nAR1z1UYs9H6gsj8g5eG0uPFWCOollj/fO1q1jnnsLp6nCIt9rw3Sq8fpzy9tv1oG\nfvsVKfTSDEiN2q3/7oOSAnQhPv5C7N8vxNooxbgwsnC6Xsu1h9XXQEWaOPqhnG2d\ngm0gBad4XfFQyQSbY5r0xMt7uWNImkhRbNlHnW0DDQKBgQDpxixVbgTA/BMdjj5E\nMhd9gghBRysa5exzU3ZoAtCr3LIXnS7Hns4KIu/MSMQoTNCjXXIlWLLVXOQq0Mnf\nffGwy0FWwavOadIeOQFoQEGIHR3GGE5ShLJxaaG4ThUlHmw53Ad/IHIxnfR8Wl2a\ntb5h5P7pquo1PqQ78ak79vJwrQKBgQDZhCT1MZqvEJ+YDeCkXSWMsIo4STUF4X8l\n5S9i8zDkIYnoGk2csqofkW51oN+4Uer/GbAJ4lL1ditjX1AkuNaBfOW/GBWvzqNG\nSY4pf4f2pLEOnnv5wwXZnXgAUWenD41HtXkizp9+Z3OtoNttPJK8sx8xMfdqarDM\nLQdJoyCzbQKBgQDXvwf9U8rZXAo8NaFriJs7Pn1l2UuDyHxetsFJHof8hHJr7qlU\nm0/l9PZAH0vBMZs/macVpnVtCgydIxGby/z5P6wuaBCqL+k18UBGOT8BYnWu85Gd\nAFA68NTKZm2HUztobpMQlR4ugms3NKK8fEyWxiMn/Y+m0gf6Nn4MFE0NBQKBgQCb\nbLYv0hMSltFDCF+Fct1660bIs17E5f1BqcMzdExyJpjxFaJxnqS7S+LfAGX7weUm\nBUfpuCPJK3gTWK7enokAG6va4S3V4tR+S97ePjd8APBXXt19eWI7vi5aI9Dp6c3s\n+HonafdDjk51OaSxKIA9f8yBDZAaJURRkLdNYdfi/QKBgQCXnvKg/V4m4Pn0OTkf\nzAQ4tWXakJmuD6VFDkH3ZglPNIokdrAzwAymzbf5r3JYtrUmjDzIVVijDpAcRY+z\nsbRa9rUwqp7A8QEC2Z4ECXsCmgRy57iQmu0muarVdEo0oCyb6aFmsjEkE/S6jRs3\neIl1jRPtozYtDw9KL6oolGDP5w==\n-----END PRIVATE KEY-----\n',
-  client_email:
-    'firebase-adminsdk-ul55x@zahner-production-8e2af.iam.gserviceaccount.com',
-  client_id: '108625038685774307556',
-  auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-  token_uri: 'https://oauth2.googleapis.com/token',
-  auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-  client_x509_cert_url:
-    'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ul55x%40zahner-production-8e2af.iam.gserviceaccount.com',
-}
+// const serviceAccount = {
+//   type: 'service_account',
+//  //project_id: "zahner-production-8e2af",
+//   project_id: "csc-surveylink",
+//   private_key_id: "71621f0ad5a838b9d0ae88d69a5066e743c5fa5a",
+//   private_key:
+//     '-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDGoaeDDH9i1M+/\nP/aghXd0TMmuPuLu9IWqNyrmeTbbgEL0RDt8j7HtFrjo+w2MbKeDHPiCQSqGJ7iz\nkgQ1S81/IKm3dMGutJixESKDsnHZzncaBfAe5ijtgat/FA6B7GiyeehV5t3EKQ/X\nimxZg4t14riA6/GYZPVrchVRNRhsTGHVirnI9TtfqqcjSg1cVfdFg62+vzAIyj8B\nudFivo9t/ZbIoJ+x4Lz0ByPDyJMm7uehVYRYbzDKeDi0FjvV9rs0j7ya7JR9sLfT\nriAiKoCft98/89p2YTHOULJRG1Jep9Q9kuHS4wT4RLXcS+wdGuBjLKqTUf93/4uV\nFJTmovCpAgMBAAECggEACezadLUraVoWbmlJDtDUfPp4Sm1ohAWyZyS+D0mnyNSS\nI+gD6++3NZBg2X1v+iAUx7urHEEa2ZzDATAO50XcJRnR+TGLmwn5pkFjrt58C2Ti\ndSmuS7D3AxUrZ1xudCYGvkJSrnYshyiBGuVXECr/TTrwurpvdky3KbEH6SikyYZ6\nAR1z1UYs9H6gsj8g5eG0uPFWCOollj/fO1q1jnnsLp6nCIt9rw3Sq8fpzy9tv1oG\nfvsVKfTSDEiN2q3/7oOSAnQhPv5C7N8vxNooxbgwsnC6Xsu1h9XXQEWaOPqhnG2d\ngm0gBad4XfFQyQSbY5r0xMt7uWNImkhRbNlHnW0DDQKBgQDpxixVbgTA/BMdjj5E\nMhd9gghBRysa5exzU3ZoAtCr3LIXnS7Hns4KIu/MSMQoTNCjXXIlWLLVXOQq0Mnf\nffGwy0FWwavOadIeOQFoQEGIHR3GGE5ShLJxaaG4ThUlHmw53Ad/IHIxnfR8Wl2a\ntb5h5P7pquo1PqQ78ak79vJwrQKBgQDZhCT1MZqvEJ+YDeCkXSWMsIo4STUF4X8l\n5S9i8zDkIYnoGk2csqofkW51oN+4Uer/GbAJ4lL1ditjX1AkuNaBfOW/GBWvzqNG\nSY4pf4f2pLEOnnv5wwXZnXgAUWenD41HtXkizp9+Z3OtoNttPJK8sx8xMfdqarDM\nLQdJoyCzbQKBgQDXvwf9U8rZXAo8NaFriJs7Pn1l2UuDyHxetsFJHof8hHJr7qlU\nm0/l9PZAH0vBMZs/macVpnVtCgydIxGby/z5P6wuaBCqL+k18UBGOT8BYnWu85Gd\nAFA68NTKZm2HUztobpMQlR4ugms3NKK8fEyWxiMn/Y+m0gf6Nn4MFE0NBQKBgQCb\nbLYv0hMSltFDCF+Fct1660bIs17E5f1BqcMzdExyJpjxFaJxnqS7S+LfAGX7weUm\nBUfpuCPJK3gTWK7enokAG6va4S3V4tR+S97ePjd8APBXXt19eWI7vi5aI9Dp6c3s\n+HonafdDjk51OaSxKIA9f8yBDZAaJURRkLdNYdfi/QKBgQCXnvKg/V4m4Pn0OTkf\nzAQ4tWXakJmuD6VFDkH3ZglPNIokdrAzwAymzbf5r3JYtrUmjDzIVVijDpAcRY+z\nsbRa9rUwqp7A8QEC2Z4ECXsCmgRy57iQmu0muarVdEo0oCyb6aFmsjEkE/S6jRs3\neIl1jRPtozYtDw9KL6oolGDP5w==\n-----END PRIVATE KEY-----\n',
+//   client_email:
+//     'firebase-adminsdk-ul55x@zahner-production-8e2af.iam.gserviceaccount.com',
+//   client_id: '108625038685774307556',
+//   //auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+//   auth_uri: 'csc-surveylink.firebaseapp.com',
+//   token_uri: 'https://oauth2.googleapis.com/token',
+//   auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+//   client_x509_cert_url:
+//     'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ul55x%40zahner-production-8e2af.iam.gserviceaccount.com',
+// }
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCIoL9RlD15JzJo1XDPBzTm1xR6StBUaxI",
+  authDomain: "csc-surveylink.firebaseapp.com",
+  projectId: "csc-surveylink",
+  storageBucket: "csc-surveylink.appspot.com",
+  messagingSenderId: "473701857342",
+  appId: "1:473701857342:web:73573aa5b8fc7db50b396f",
+  measurementId: "G-71DM2KZP94"
+};
+
+
+
+
+
 
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),

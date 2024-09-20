@@ -1,4 +1,4 @@
-cd "%UserProfile%\Documents\GitHub\telnet-setup\client"
+cd "C:\Users\vahid\OneDrive\Documents\GitHub\telnet-setup\telnet-setup\client"
 start yarn start
-cd "%UserProfile%\Documents\GitHub\telnet-setup"
+cd "C:\Users\vahid\OneDrive\Documents\GitHub\telnet-setup\telnet-setup"
 start yarn start
