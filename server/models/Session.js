@@ -1,125 +1,112 @@
+import { db, serverTimestamp } from '../helpers/firebase.js';
+import { zeaDebug } from '../helpers/zeaDebug.js';
 
-import { db, serverTimestamp } from '../helpers/firebase.js'
-import { zeaDebug } from '../helpers/zeaDebug.js'
-
-// const fs = require('fs');
-// const path = require('path');
-// import fs from 'fs';
-// import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 class Session {
-  #latestSelectedAnchor
-  
-  constructor(id){
-  //constructor(id, name) {
-    if (!id) {
-      throw new Error('Missing `id` arg.')
-    }
+  #latestSelectedAnchor;
 
-    //console.log('session id', id,'hDrHo89VPEpFFqfqFvNI',  db)
-    this.id = id
+  constructor(id) {
+    if (!id) {
+      throw new Error('Missing `id` arg.');
+    }
+    this.id = id;
   }
 
   async init() {
-    await this.#observeSession()
+    await this.#observeSession();
   }
 
   async addPoint(point, anchor) {
     if (!anchor && !this.#latestSelectedAnchor) {
       console.warn(
         'Missing `anchor` and `latestSelectedAnchor`. Did you remember to #init the session?'
-      )
-
-      return
+      );
+      return;
     }
-    // console.log('anchor || this.#latestSelectedAnchor', anchor, this.#latestSelectedAnchor)
-    console.log('anchor selected : ', anchor)
-    const theAnchor = anchor || this.#latestSelectedAnchor // Isues: this.#latestSelectedAnchor is holding onto previouw anchor
 
+    console.log('anchor selected: ', anchor);
+    const theAnchor = anchor || this.#latestSelectedAnchor;
 
-    const docRef = db.collection('points').doc()
-    const { id } = docRef
-    
+    // Create a document reference for a new point
+    const docRef = doc(collection(db, 'points'));
+
     const data = {
-      id,
+      id: docRef.id, // Use docRef.id for the document ID
       createdAt: serverTimestamp(),
       sessionId: this.id,
       anchor: theAnchor,
       string: point,
-    }
+    };
 
-      // // Convert the data object to a CSV string
-      // const csvData = Object.values(data).join(',') + '\n';
+    await setDoc(docRef, data);
 
-      // // Append the CSV data to the file
-      // fs.appendFile(path.join(process.cwd(), 'points.csv'), csvData, (err) => {
-      //   if (err) throw err;
-      //   console.log('The "data to append" was appended to file!');
-      // });
+    zeaDebug("Created new point with id '%s' and anchor '%s'", docRef.id, theAnchor);
 
-    // console.log('data :', data)
-    await docRef.set(data)
-
-    zeaDebug("Created new point with id '%s' and anchor '%s'", id, theAnchor)
-
-    return id
+    return docRef.id; // Return the new document ID
   }
 
   onCommandCreated(callback) {
-    const query = db
-      .collection('commands')
-      .where('sessionId', '==', this.id)
-      .where('isInvoked', '==', false)
-      .orderBy('createdAt')
+    const q = query(
+      collection(db, 'commands'),
+      where('sessionId', '==', this.id),
+      where('isInvoked', '==', false),
+      orderBy('createdAt')
+    );
 
-    const unsub = query.onSnapshot((snapshot) => {
+    const unsub = onSnapshot(q, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
-          callback(change.doc.data())
+          callback(change.doc.data());
         }
-      })
-    })
+      });
+    });
 
-    return unsub
+    return unsub;
   }
-
-
 
   async #observeSession() {
-    const docRef = db.collection('sessions').doc(this.id)
-    const doc = await docRef.get()
+    console.log("db sessions", this.id, '\n', db);
+
+    const docRef = doc(collection(db, 'sessions'), this.id);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) {
+    if (!docSnap.exists()) {
       throw new Error(
-      `Session not found. Id: "${this.id}". Session must be created using the web app`
-      )
+        `Session not found. Id: "${this.id}". Session must be created using the web app`
+      );
     }
 
-    
-    zeaDebug("Found existing session with id '%s'", this.id)
+    zeaDebug("Found existing session with id '%s'", this.id);
 
     if (this.unsub) {
-      this.unsub()
+      this.unsub();
     }
     
-    this.unsub = docRef.onSnapshot(
-      (snapshot) => {
-        this.#latestSelectedAnchor =
-         snapshot.data().latestSelectedAnchor || null
-         console.log("current anchor selected ", this.#latestSelectedAnchor )
-       
-      },
-      (error) => {
-        console.log(`Encountered error: ${error}`)
-      }
-    )
+    this.unsub = onSnapshot(docRef, (snapshot) => {
+      this.#latestSelectedAnchor = snapshot.data().latestSelectedAnchor || null;
+      console.log("current anchor selected", this.#latestSelectedAnchor);
+    }, (error) => {
+      console.log(`Encountered error: ${error}`);
+    });
   }
-  
+
+  // Example method to mark a command as invoked (not originally in your code)
+  async #markAsInvoked() {
+    try {
+      const docRef = doc(collection(db, 'commands'), this.data.id);
+      await setDoc(docRef, { isInvoked: true }, { merge: true });
+      console.log(`Command marked as invoked for anchor: ${this.data.anchor}`);
+    } catch (error) {
+      console.error('Error marking command as invoked:', error);
+    }
+  }
 }
 
-export { Session }
+export { Session };

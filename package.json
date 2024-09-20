@@ -2,8 +2,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "firebase-admin": "^9.11.1",
-    "local-devices": "^4.0.0",
+    "firebase": "^10.13.2",
+    "firebase-admin": "^12.5.0",
+    "local-devices": "^3.0.0",
     "rxjs": "^7.3.0",
     "telnet-client": "^1.4.9"
   },

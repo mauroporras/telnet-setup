@@ -39,16 +39,25 @@ class ClientSession {
   // async #observeSession() {
   async observeSession() {
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCwm0Nex3W_jTBFZWAofXH7r4mTa3bdosw",
-      authDomain: "zahner-production-8e2af.firebaseapp.com",
-      projectId: "zahner-production-8e2af",
-      storageBucket: "zahner-production-8e2af.appspot.com",
-      messagingSenderId: "379521829525",
-      appId: "1:379521829525:web:ca6517410571680ab6299c",
-      measurementId: "G-7X3BB5E4MG"
-    };
+    // const firebaseConfig = {
+    //   apiKey: "AIzaSyCwm0Nex3W_jTBFZWAofXH7r4mTa3bdosw",
+    //   authDomain: "zahner-production-8e2af.firebaseapp.com",
+    //   projectId: "zahner-production-8e2af",
+    //   storageBucket: "zahner-production-8e2af.appspot.com",
+    //   messagingSenderId: "379521829525",
+    //   appId: "1:379521829525:web:ca6517410571680ab6299c",
+    //   measurementId: "G-7X3BB5E4MG"
+    // };
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyCIoL9RlD15JzJo1XDPBzTm1xR6StBUaxI",
+      authDomain: "csc-surveylink.firebaseapp.com",
+      projectId: "csc-surveylink",
+      storageBucket: "csc-surveylink.appspot.com",
+      messagingSenderId: "473701857342",
+      appId: "1:473701857342:web:73573aa5b8fc7db50b396f",
+      measurementId: "G-71DM2KZP94"
+    };
     // const firebaseConfig = {
     //   apiKey: "AIzaSyDhrTyj2hISapfNqAyGEEb5p2s47wi9_mA",
     //   authDomain: "zahner-development.firebaseapp.com",
@@ -63,7 +72,7 @@ class ClientSession {
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    console.log("db", db)
+    // console.log("db", db)
 
     // const querySnapshot = await getDocs(collection(db, "sessions"));
     // const dbGrab = await getDocs(collection(db, "sessions"));
