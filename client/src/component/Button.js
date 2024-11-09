@@ -1,24 +1,22 @@
+// client/src/components/Button.js
 import React from 'react';
-import Stack from '@mui/material/Stack/index.js';
-import Button from '@mui/material/Button/index.js';
-// import axios from 'axios';
+import { Button } from '@mui/material';
 
-
-
-export default function BasicButtons(props) {
-//   const [state, setState] = useState()
-
-
-  const handleOnClick = () => {
-    props.setButtonStatus(true)
-  // console.log('button')
-  }
+const ButtonStart = ({ setButtonStatus }) => {
+  const handleClick = () => {
+    setButtonStatus(true);
+  };
 
   return (
-    <Stack spacing={2} direction="row"  style={{margin: "5% 0 5% 50%" }}>
-      {/* <Button variant="text">Start Server</Button> */}
-      <Button variant="contained" onClick={handleOnClick}>Start Server</Button>
-      {/* <Button variant="outlined">Outlined</Button> */}
-    </Stack>
+    <Button 
+      variant="contained" 
+      color="primary" 
+      onClick={handleClick}
+      sx={{ height: '56px', width: '150px' }}
+    >
+      Start
+    </Button>
   );
-}
+};
+
+export default ButtonStart;

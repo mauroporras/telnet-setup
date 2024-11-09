@@ -1,28 +1,33 @@
+// server/models/Sessions.js
 import { db, serverTimestamp } from '../helpers/firebase.js';
 import { zeaDebug } from '../helpers/zeaDebug.js';
+import { collection, doc, setDoc, getDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import EventEmitter from 'events';
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-class Session {
+class Session extends EventEmitter {
   #latestSelectedAnchor;
 
   constructor(id) {
+    super();
     if (!id) {
-      throw new Error('Missing `id` arg.');
+      throw new Error('Missing `id` argument.');
     }
     this.id = id;
+    this.unsub = null;
   }
 
+  /**
+   * Initializes the session by observing Firestore documents.
+   */
   async init() {
     await this.#observeSession();
   }
 
+  /**
+   * Adds a point to the session and Firestore.
+   * @param {string} point - The point data.
+   * @param {string} [anchor] - The anchor associated with the point.
+   */
   async addPoint(point, anchor) {
     if (!anchor && !this.#latestSelectedAnchor) {
       console.warn(
@@ -31,7 +36,7 @@ class Session {
       return;
     }
 
-    console.log('anchor selected: ', anchor);
+    console.log('Anchor selected:', anchor);
     const theAnchor = anchor || this.#latestSelectedAnchor;
 
     // Create a document reference for a new point
@@ -45,13 +50,19 @@ class Session {
       string: point,
     };
 
-    await setDoc(docRef, data);
-
-    zeaDebug("Created new point with id '%s' and anchor '%s'", docRef.id, theAnchor);
-
-    return docRef.id; // Return the new document ID
+    try {
+      await setDoc(docRef, data);
+      zeaDebug("Created new point with id '%s' and anchor '%s'", docRef.id, theAnchor);
+      console.log(`Point added to Firestore: ${point}`);
+    } catch (error) {
+      console.error('Error adding point to Firestore:', error);
+    }
   }
 
+  /**
+   * Sets up a listener for new commands in Firestore.
+   * @param {Function} callback - The function to call when a new command is created.
+   */
   onCommandCreated(callback) {
     const q = query(
       collection(db, 'commands'),
@@ -66,20 +77,26 @@ class Session {
           callback(change.doc.data());
         }
       });
+    }, (error) => {
+      console.error(`Error listening to commands for session ${this.id}:`, error);
     });
 
-    return unsub;
+    // Store the unsubscribe function to allow cleanup if needed
+    this.unsub = unsub;
   }
 
+  /**
+   * Observes the session document in Firestore to keep track of the latest selected anchor.
+   */
   async #observeSession() {
-    console.log("db sessions", this.id, '\n', db);
+    console.log("Observing session:", this.id);
 
     const docRef = doc(collection(db, 'sessions'), this.id);
     const docSnap = await getDoc(docRef);
-    
+
     if (!docSnap.exists()) {
       throw new Error(
-        `Session not found. Id: "${this.id}". Session must be created using the web app`
+        `Session not found. ID: "${this.id}". Session must be created using the web app.`
       );
     }
 
@@ -88,23 +105,22 @@ class Session {
     if (this.unsub) {
       this.unsub();
     }
-    
+
     this.unsub = onSnapshot(docRef, (snapshot) => {
       this.#latestSelectedAnchor = snapshot.data().latestSelectedAnchor || null;
-      console.log("current anchor selected", this.#latestSelectedAnchor);
+      console.log("Current anchor selected:", this.#latestSelectedAnchor);
     }, (error) => {
-      console.log(`Encountered error: ${error}`);
+      console.error(`Error observing session ${this.id}:`, error);
     });
   }
 
-  // Example method to mark a command as invoked (not originally in your code)
-  async #markAsInvoked() {
-    try {
-      const docRef = doc(collection(db, 'commands'), this.data.id);
-      await setDoc(docRef, { isInvoked: true }, { merge: true });
-      console.log(`Command marked as invoked for anchor: ${this.data.anchor}`);
-    } catch (error) {
-      console.error('Error marking command as invoked:', error);
+  /**
+   * Cleans up listeners when the session is no longer needed.
+   */
+  cleanup() {
+    if (this.unsub) {
+      this.unsub();
+      this.unsub = null;
     }
   }
 }

@@ -1,110 +1,197 @@
-import React, {useState, useEffect} from 'react';
+// client/src/components/App.js
+import React, { useState, useEffect } from 'react';
+import DropDownListSession from './DropDownListSession.js';
+import ButtonStart from './Button.js';
+import Output from './Output.js';
+// import Logs from './Logs.js'; // If you have a separate Logs component
+import { Box, Typography, CircularProgress } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import socket from '../socket'; // Import the socket instance
 
-//import DropDownList from './DropDownList.js';
-import DropDownListSession from './DropDownListSession.js'
-import ButtonStart from './Button.js'
-// import OutPut from './Output.js'
-// import axios from 'axios';
-// import { useScrollTrigger } from '@mui/material';
-// import Streamer from '../Streamer.js'
-// import cors from "cors"
-
-
-
- 
 const App = () => {
-
-
-  // const [state, setState] = useState()
-  const [buttonStatus, setButtonStatus] = useState(false)
-  //const [ipValue, setIpValue] = useState('')
-  const [sessioniDValue, setSessionIDValue] = useState('')
-  const [stationiDValue, setStationIDValue] = useState('')
-  const [stationName, setStationName] = useState('')
-
-
+  const [buttonStatus, setButtonStatus] = useState(false);
+  const [sessionIDValue, setSessionIDValue] = useState('');
+  const [stationIDValue, setStationIDValue] = useState('');
+  const [stationName, setStationName] = useState('');
   const [data, setData] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('Start connection'); // Initialized as 'Connecting'
+  const [loading, setLoading] = useState(false);
+  const [logs, setLogs] = useState([]); // State to hold logs
 
-  
-    useEffect(() => {
-      //console.log('useeffect', ipValue, iDValue)
-
-
-      if(buttonStatus){
+  useEffect(() => {
+    if (buttonStatus) {
+      setLoading(true);
       const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json',
-        'Accept': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json' 
+        },
         body: JSON.stringify({ 
           title: 'start telnet streamer',
-          //IPAddress: ipValue,
-          sessionID: sessioniDValue,
-          stationMac: stationiDValue,
+          sessionID: sessionIDValue,
+          stationMac: stationIDValue,
           stationNames: stationName,
-          
-         })
+        })
       };
-  
+
       fetch("/api/button", requestOptions)
         .then((res) => res.json())
-        .then((data) => setData(data.message));
+        .then((data) => {
+          setData(data.message);
+          // Removed setConnectionStatus('Connected') from here
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          setData('Connection failed.');
+          // Removed setConnectionStatus('Disconnected') from here
+          setLoading(false);
+        });
 
-        setButtonStatus(false)
-      }
+      setButtonStatus(false);
+    }
 
-    }, [buttonStatus,  sessioniDValue, stationiDValue, stationName]);//ipValue,
+    // WebSocket event listeners
 
+    // Listen for 'stream-data' events
+    socket.on('stream-data', (streamData) => {
+      setData(streamData);
+    });
 
-    console.log(data)
+    // Listen for 'log' events
+    socket.on('log', (log) => {
+      setLogs((prevLogs) => [...prevLogs, log]);
+    });
 
+    // Listen for 'connect' event
+    socket.on('connect', () => {
+      setConnectionStatus('Connected');
+      // Optional: console.log('WebSocket connected');
+    });
 
-  if (buttonStatus){
+    // Listen for 'disconnect' event
+    socket.on('disconnect', () => {
+      setConnectionStatus('Disconnected');
+      // Optional: console.warn('WebSocket disconnected');
+    });
 
-    console.log('button2')
-  }
+    // Listen for 'connect_error' event
+    socket.on('connect_error', (error) => {
+      setConnectionStatus('Connection Error');
+      console.error('WebSocket connection error:', error);
+    });
 
+    // Listen for 'reconnect_attempt' event
+    socket.on('reconnect_attempt', () => {
+      setConnectionStatus('Trying to reconnect');
+    });
 
+    // Listen for 'reconnect_error' event
+    socket.on('reconnect_error', (error) => {
+      setConnectionStatus('Reconnection Error');
+      console.error('Reconnection error:', error);
+    });
+
+    // Listen for 'reconnect_failed' event
+    socket.on('reconnect_failed', () => {
+      setConnectionStatus('Failed to reconnect');
+    });
+
+    // Listen for 'reconnect' event
+    socket.on('reconnect', () => {
+      setConnectionStatus('Connected');
+    });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.off('stream-data');
+      socket.off('log');
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('connect_error');
+      socket.off('reconnect_attempt');
+      socket.off('reconnect_error');
+      socket.off('reconnect');
+    };
+  }, [buttonStatus, sessionIDValue, stationIDValue, stationName]);
 
   return (
-    <div className='ui container grid' style={{maxWidth: "400px"}}>
+    <ThemeProvider theme={createTheme()}>
+      <Box sx={{ p: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Telnetserver Control Panel
+        </Typography>
 
-        <div className='ui row' style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div className='column eight wide' style={{ marginRight: '50px' }}>
-            <DropDownListSession setSessionIDValue={setSessionIDValue} setStationIDValue={setStationIDValue} setStationName={setStationName}/>
-          </div>
-          <div className='column eight wide' style={{ display: 'flex', justifyContent: 'center',  marginTop: '50px',  marginBottom: '50px'  }}>
-            <ButtonStart setButtonStatus={setButtonStatus}/>
-          </div>
-        </div>
-      {/* </div>
-      <div className='ui row'>
-        <div className='column eight wide'>
-          <DropDownListSession setSessionIDValue={setSessionIDValue} setStationIDValue={setStationIDValue} setStationName={setStationName}/>
-        </div>
-        <div className='column eight wide' >
-            {/* <div style={{marginTop: "5%"}}>
-                - Session ID
-            </div>
-         
-        </div>
-      </div>
-      <br/>
-      <div className='ui row'/>
-      <div className='ui row'>
-        <div className='column eight wide'  >
-          <ButtonStart  setButtonStatus={setButtonStatus}/>
-        </div>
-        
-      </div> */}
-      {/* <div className='ui row'>
-        <div className='column eight wide'>
-          <OutPut data={!data ? "" : data}/>
-        </div>
-      </div> */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+          <DropDownListSession 
+            setSessionIDValue={setSessionIDValue} 
+            setStationIDValue={setStationIDValue} 
+            setStationName={setStationName}
+          />
+          <ButtonStart setButtonStatus={setButtonStatus} />
+        </Box>
 
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="subtitle1">
+            Connection Status: <span style={{ color: getStatusColor(connectionStatus) }}>{connectionStatus}</span>
+            {loading && <CircularProgress size={20} sx={{ ml: 2 }} />}
+          </Typography>
+        </Box>
 
-    </div>
-  )
+        <Output data={data} />
+
+        {/* Display Logs */}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Application Logs
+          </Typography>
+          <Box sx={{ maxHeight: '300px', overflowY: 'scroll', border: '1px solid #ccc', p: 2 }}>
+            {logs.length > 0 ? (
+              logs.map((log, index) => (
+                <Typography key={index} variant="body2">
+                  <strong>[{log.timestamp}]</strong> <span style={{ color: getLogColor(log.level) }}>{log.level.toUpperCase()}</span>: {log.message}
+                </Typography>
+              ))
+            ) : (
+              <Typography variant="body2">No logs to display.</Typography>
+            )}
+          </Box>
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
+};
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'Start connection':
+      return 'yellow';
+    case 'Connected':
+      return 'green';
+    case 'Connecting':
+      return 'blue';
+    case 'Connection Error':
+    case 'Reconnection Error':
+    case 'Failed to reconnect':
+      return 'red';
+    case 'Trying to reconnect':
+      return 'orange';
+    default:
+      return 'black';
+  }
+};
+const getLogColor = (level) => {
+  switch (level) {
+    case 'info':
+      return 'green';
+    case 'warn':
+      return 'orange';
+    case 'error':
+      return 'red';
+    default:
+      return 'black';
+  }
 };
 
 export default App;

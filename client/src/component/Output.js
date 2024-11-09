@@ -1,62 +1,20 @@
-import React, { useEffect } from 'react'
-import Box from '@mui/material/Box/index.js';
-import TextField from '@mui/material/TextField/index.js';
+// client/src/components/Output.js
+import React from 'react';
+import { Box, Typography, Paper } from '@mui/material';
 
-export default function MultilineTextFields({data}) {
-  const [value, setValue] = React.useState('');
-
-  useEffect(() => {
-    if(data != null){
-      setValue(data + '\n' + value )
-    }
-    }, [data]);
-  // console.log(data)
-  // listMessages.push(data)
-  
-  // const messagesEndRef = useRef(null)
-
-  // const scrollToBottom = () => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  // }
-
-  // useEffect(() => {
-  //   scrollToBottom()
-  // }, [data]);
-
-  // const handleChange = (event) => {
-    // setValue(event.target.value);
-    // setValue( props.data + '/n')
-  // };
-
+const Output = ({ data }) => {
   return (
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '100%' },
-      }}
-      noValidate
-      autoComplete="off"
-    >
-      
-      <div >
-        
-        {/* {listMessages.map(message => <span key={message.id} {...message} />)}
-        <div ref={messagesEndRef} /> */}
-
-        <TextField
-          id="filled-multiline-static"
-          label="Output Telnet stream"
-          multiline
-          rows={4}
-          // defaultValue="Default Value"
-          variant="filled"
-          value={value}
-          // value={props.data}
-          // onChange={handleChange}
-        />
-      </div>
-      
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        Output:
+      </Typography>
+      <Paper elevation={3} sx={{ p: 2, minHeight: '200px', maxHeight: '400px', overflowY: 'auto' }}>
+        <Typography variant="body1">
+          {data ? data : 'No data received yet.'}
+        </Typography>
+      </Paper>
     </Box>
   );
-}
+};
 
+export default Output;

@@ -1,56 +1,40 @@
-import { MockStreamer } from './MockStreamer.js'
-import { TelnetStreamer } from './TelnetStreamer.js'
-import { StreamerDbBridge } from './StreamerDbBridge.js'
+// server/StreamerEntry.js
+import { TelnetStreamer } from './TelnetStreamer.js';
+import { StreamerDbBridge } from './StreamerDbBridge.js';
+// import { Session } from './models/Sessions.js';
+import {Session} from './models/Session.js';
 
-import { Session } from './models/Session.js'
+const StreamerEntry = async (stationMac, sessID, stationName) => {
+  const ZEA_STREAMER_TYPE = 'telnet'; // Change to 'mock' if using MockStreamer
+  const ZEA_SESSION_ID = sessID || 'test';
 
+  // Define the station MAC addresses and names
+  const stationMacs = [stationMac];
+  const stationNames = [stationName];
 
+  // Initialize the streamer
+  const streamer = new TelnetStreamer({
+    stationMacs: stationMacs,      // Array of MAC addresses
+    stationNames: stationNames,    // Array of station names
+    port: 1212,                     // Telnet port
+  });
 
+  // Initialize the session
+  const session = new Session(ZEA_SESSION_ID);
 
-const  StreamerEntry = async (stationMac, sessID, stationName) => {
+  // Initialize the bridge
+  const streamerDbBridge = new StreamerDbBridge(streamer, session);
 
-  // const ZEA_SESSION_ID = 'NyNhQ9U9RTjhH9X1sFrd'
+  console.log('StreamerDbBridge initialized.');
 
-  const ZEA_STREAMER_TYPE = 'telnet' 
-  const ZEA_SESSION_ID = sessID || 'test'
-
-// const ZEA_STREAMER_TYPE = process.env.ZEA_STREAMER_TYPE || ''
-// const ZEA_SESSION_ID = process.env.ZEA_SESSION_ID || ''
-
-  const shouldUseMock = ZEA_STREAMER_TYPE === 'mock' ? true : false
-  // console.log('status ', shouldUseMock)
-
-  const ZEA_TEST_POINTS_FILE = '/home/pi/git/telnet-setup/Setup Survey Points.txt'
-
-  const streamer = shouldUseMock
-    ? // ? new MockStreamer(process.env.ZEA_TEST_POINTS_FILE)
-      new MockStreamer(ZEA_TEST_POINTS_FILE)
-    : new TelnetStreamer({
-        // host: ip,
-        stationMacs: stationMac,
-        stationNames: stationName,
-        // host: process.env.ZEA_TELNET_HOST,
-        // host: '192.168.1.3',
-        // port: process.env.ZEA_TELNET_PORT,
-        port: 1212,
-      })
-
-
-  
-  const sessionId = ZEA_SESSION_ID
- 
-
-  const session = new Session(sessionId)
-
-  const streamerDbBridge = new StreamerDbBridge(streamer, session)
-  
-  console.log('session started ')
-  
-  const dataReturned = await streamerDbBridge.start()
-  // console.log('dataReturned', dataReturned)
-  //streamerDbBridge.send(cmd)
-  
-  return dataReturned
-}
+  try {
+    await streamerDbBridge.start();
+    console.log('StreamerDbBridge started successfully.');
+    return 'Streamer started successfully.';
+  } catch (error) {
+    console.error('Error in StreamerEntry:', error);
+    throw error;
+  }
+};
 
 export default StreamerEntry;
