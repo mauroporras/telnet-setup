@@ -1,12 +1,12 @@
-// client/src/components/App.js
+// client/src/component/App.js
 import React, { useState, useEffect } from 'react';
 import DropDownListSession from './DropDownListSession.js';
 import ButtonStart from './Button.js';
 import Output from './Output.js';
-// import Logs from './Logs.js'; // If you have a separate Logs component
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import socket from '../socket'; // Import the socket instance
+import { API_BASE_URL, WS_URL } from '../config'; // Import config variables
 
 const App = () => {
   const [buttonStatus, setButtonStatus] = useState(false);
@@ -14,7 +14,7 @@ const App = () => {
   const [stationIDValue, setStationIDValue] = useState('');
   const [stationName, setStationName] = useState('');
   const [data, setData] = useState(null);
-  const [connectionStatus, setConnectionStatus] = useState('Start connection'); // Initialized as 'Connecting'
+  const [connectionStatus, setConnectionStatus] = useState('Start connection');
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState([]); // State to hold logs
 
@@ -35,17 +35,15 @@ const App = () => {
         })
       };
 
-      fetch("/api/button", requestOptions)
+      fetch(`${API_BASE_URL}/api/button`, requestOptions)
         .then((res) => res.json())
         .then((data) => {
           setData(data.message);
-          // Removed setConnectionStatus('Connected') from here
           setLoading(false);
         })
         .catch((error) => {
           console.error('Error:', error);
           setData('Connection failed.');
-          // Removed setConnectionStatus('Disconnected') from here
           setLoading(false);
         });
 
@@ -67,13 +65,11 @@ const App = () => {
     // Listen for 'connect' event
     socket.on('connect', () => {
       setConnectionStatus('Connected');
-      // Optional: console.log('WebSocket connected');
     });
 
     // Listen for 'disconnect' event
     socket.on('disconnect', () => {
       setConnectionStatus('Disconnected');
-      // Optional: console.warn('WebSocket disconnected');
     });
 
     // Listen for 'connect_error' event

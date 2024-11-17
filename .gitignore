@@ -184,3 +184,5 @@ docs/
 # Ignore temporary build directories
 temp/
 tmp/
+
+package-lock.json

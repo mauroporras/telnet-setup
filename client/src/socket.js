@@ -1,11 +1,9 @@
 // client/src/socket.js
 import { io } from 'socket.io-client';
+import { WS_URL } from './config';
 
-const SOCKET_IO_URL = process.env.REACT_APP_SOCKET_IO_URL || 'http://localhost:3002';
-
-const socket = io(SOCKET_IO_URL, {
-  transports: ['websocket'], // Use WebSocket transport only
-  // Additional options if needed
+const socket = io(WS_URL, {
+  transports: ['websocket'],
 });
 
 export default socket;

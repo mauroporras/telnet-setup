@@ -1,0 +1,45 @@
+
+{
+    "appId": "com.yourcompany.telnetserver",
+    "productName": "TelnetServer",
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "files": [
+        "client/build/**/*",
+        "main.js",
+        "preload.js",
+        "package.json",
+        "assets/**/*",
+        "node_modules/**/*",
+        "server/**/*",
+        "server/node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/surveyLink.ico"
+    },
+    "mac": {
+        "target": "dmg",
+        "icon": "assets/icon.icns"
+      },
+      "linux": {
+        "target": "AppImage",
+        "icon": "assets/icon.png"
+      },
+    "asar": {
+      "smartUnpack": true
+    },
+    "extraMetadata": {
+      "main": "main.js"
+    },
+    "extraResources": [
+      {
+        "from": "server/",
+        "to": "server/",
+        "filter": ["**/*"]
+      }
+    ]
+  }
+  

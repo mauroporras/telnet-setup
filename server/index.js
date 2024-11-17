@@ -4,16 +4,17 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import StreamerEntry from './server/StreamerEntry.js'; // Import the StreamerEntry function
-import logger, { addLoggerTransport } from './server/helpers/logger.js'; // Using the logger
+import StreamerEntry from './StreamerEntry.js'; // Corrected import
+import logger, { addLoggerTransport } from './helpers/logger.js'; // Corrected import
+
+import Transport from 'winston-transport';
 
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: '*', // Adjust for security in production
-    methods: ['GET', 'POST'],
-  },
+    origin: "*",
+  }
 });
 
 // Middleware
@@ -44,16 +45,14 @@ app.post('/api/button', async (req, res) => {
 
 // Socket.io Connection
 io.on('connection', (socket) => {
-  logger.info(`Client connected: ${socket.id}`);
+  console.log('A user connected');
 
   socket.on('disconnect', () => {
-    logger.info(`Client disconnected: ${socket.id}`);
+    console.log('User disconnected');
   });
 });
 
 // Custom Socket.IO Transport for Winston
-import Transport from 'winston-transport';
-
 class SocketIOTransport extends Transport {
   constructor(opts) {
     super(opts);
@@ -83,6 +82,7 @@ addLoggerTransport(new SocketIOTransport({ io }));
 
 // Start Server
 const PORT = process.env.PORT || 3002;
+
 server.listen(PORT, () => {
-  logger.info(`Server listening on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
