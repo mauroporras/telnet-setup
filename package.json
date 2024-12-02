@@ -9,7 +9,8 @@
     "electron-log": "^5.2.2",
     "firebase-admin": "^12.5.0",
     "react-scripts": "^5.0.1",
-    "rxjs": "^7.3.0"
+    "rxjs": "^7.3.0",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

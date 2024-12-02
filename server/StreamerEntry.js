@@ -1,11 +1,10 @@
 // server/StreamerEntry.js
-import { TelnetStreamer } from './TelnetStreamer.js';
+import { TelnetStreamer } from './telnetStreamer.js';
 import { StreamerDbBridge } from './StreamerDbBridge.js';
-// import { Session } from './models/Sessions.js';
-import {Session} from './models/Session.js';
+import { Session } from './models/Session.js';
+import { logger } from './helpers/logger.js'; // Import the initialized logger
 
 const StreamerEntry = async (stationMac, sessID, stationName) => {
-  const ZEA_STREAMER_TYPE = 'telnet'; // Change to 'mock' if using MockStreamer
   const ZEA_SESSION_ID = sessID || 'test';
 
   // Define the station MAC addresses and names
@@ -22,17 +21,17 @@ const StreamerEntry = async (stationMac, sessID, stationName) => {
   // Initialize the session
   const session = new Session(ZEA_SESSION_ID);
 
-  // Initialize the bridge
-  const streamerDbBridge = new StreamerDbBridge(streamer, session);
+  // Initialize the bridge with logger
+  const streamerDbBridge = new StreamerDbBridge(streamer, session, logger);
 
-  console.log('StreamerDbBridge initialized.');
+  logger.info('StreamerDbBridge initialized.');
 
   try {
     await streamerDbBridge.start();
-    console.log('StreamerDbBridge started successfully.');
+    logger.info('StreamerDbBridge started successfully.');
     return 'Streamer started successfully.';
   } catch (error) {
-    console.error('Error in StreamerEntry:', error);
+    logger.error(`Error in StreamerEntry: ${error.message}`);
     throw error;
   }
 };

@@ -4,30 +4,51 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import StreamerEntry from './StreamerEntry.js'; // Corrected import
-import logger, { addLoggerTransport } from './helpers/logger.js'; // Corrected import
-
-import Transport from 'winston-transport';
+import { logger, loggerEmitter } from './helpers/logger.js'; // Import both logger and emitter first
 
 const app = express();
 const server = http.createServer(app);
+
+// Initialize Socket.io with CORS settings
 const io = new SocketIOServer(server, {
   cors: {
-    origin: "*",
+    origin: "*", // Allow all origins; adjust as needed for security
+    methods: ["GET", "POST"]
   }
 });
 
-// Middleware
+// Listen to log events and emit them via Socket.io to the frontend
+loggerEmitter.on('log', (log) => {
+  io.emit('log', log);
+});
+
+// Now import modules that depend on the logger
+import StreamerEntry from './StreamerEntry.js';
+// Now import modules that depend on the logger
+// import { StreamerDbBridge } from './StreamerDbBridge.js';
+// import { Session } from './models/Session.js';
+// import { TelnetStreamer } from './helpers/telnetStreamer.js';
+
+// Middleware setup
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // API Endpoints
+
+/**
+ * GET /api
+ * Simple endpoint to verify server is running
+ */
 app.get('/api', (req, res) => {
   res.json({ message: 'Hello from server!' });
   logger.info('GET /api called');
 });
 
+/**
+ * POST /api/button
+ * Endpoint to start the streamer
+ */
 app.post('/api/button', async (req, res) => {
   const { title, sessionID, stationMac, stationNames } = req.body;
   logger.info(`POST /api/button called with: ${JSON.stringify({ sessionID, stationMac, stationNames })}`);
@@ -43,46 +64,18 @@ app.post('/api/button', async (req, res) => {
   }
 });
 
-// Socket.io Connection
+// Socket.io Connection Handler
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  logger.info('A user connected via Socket.io');
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    logger.info('A user disconnected from Socket.io');
   });
 });
-
-// Custom Socket.IO Transport for Winston
-class SocketIOTransport extends Transport {
-  constructor(opts) {
-    super(opts);
-    this.io = opts.io;
-  }
-
-  log(info, callback) {
-    setImmediate(() => {
-      this.emit('logged', info);
-    });
-
-    const logMessage = {
-      timestamp: info.timestamp,
-      level: info.level,
-      message: info.message,
-    };
-
-    // Emit the log to all connected clients
-    this.io.emit('log', logMessage);
-
-    callback();
-  }
-}
-
-// Add the custom transport to the logger
-addLoggerTransport(new SocketIOTransport({ io }));
 
 // Start Server
 const PORT = process.env.PORT || 3002;
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info(`Server is running on port ${PORT}`);
 });

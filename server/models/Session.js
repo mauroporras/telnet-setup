@@ -1,8 +1,9 @@
-// server/models/Sessions.js
+// server/models/Session.js
 import { db, serverTimestamp } from '../helpers/firebase.js';
 import { zeaDebug } from '../helpers/zeaDebug.js';
 import { collection, doc, setDoc, getDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import EventEmitter from 'events';
+import { logger } from '../helpers/logger.js'; // Import the initialized logger
 
 class Session extends EventEmitter {
   #latestSelectedAnchor;
@@ -30,15 +31,13 @@ class Session extends EventEmitter {
    */
   async addPoint(point, anchor) {
     if (!anchor && !this.#latestSelectedAnchor) {
-      console.warn(
-        'Missing `anchor` and `latestSelectedAnchor`. Did you remember to #init the session?'
-      );
+      logger.warn('Missing `anchor` and `latestSelectedAnchor`. Did you remember to #init the session?');
       return;
     }
 
-    console.log('Anchor selected:', anchor);
+    logger.info(`Anchor selected: ${anchor}`);
     const theAnchor = anchor || this.#latestSelectedAnchor;
-
+    logger.info(`Anchor selected: ${anchor}`);
     // Create a document reference for a new point
     const docRef = doc(collection(db, 'points'));
 
@@ -53,9 +52,9 @@ class Session extends EventEmitter {
     try {
       await setDoc(docRef, data);
       zeaDebug("Created new point with id '%s' and anchor '%s'", docRef.id, theAnchor);
-      console.log(`Point added to Firestore: ${point}`);
+      logger.info(`Point added to Firestore: ${point}`);
     } catch (error) {
-      console.error('Error adding point to Firestore:', error);
+      logger.error('Error adding point to Firestore:', error);
     }
   }
 
@@ -78,7 +77,7 @@ class Session extends EventEmitter {
         }
       });
     }, (error) => {
-      console.error(`Error listening to commands for session ${this.id}:`, error);
+      logger.error(`Error listening to commands for session ${this.id}:`, error);
     });
 
     // Store the unsubscribe function to allow cleanup if needed
@@ -89,7 +88,7 @@ class Session extends EventEmitter {
    * Observes the session document in Firestore to keep track of the latest selected anchor.
    */
   async #observeSession() {
-    console.log("Observing session:", this.id);
+    logger.info(`Observing session: ${this.id}`);
 
     const docRef = doc(collection(db, 'sessions'), this.id);
     const docSnap = await getDoc(docRef);
@@ -101,6 +100,7 @@ class Session extends EventEmitter {
     }
 
     zeaDebug("Found existing session with id '%s'", this.id);
+    logger.info(`Found existing session with id '${this.id}'`);
 
     if (this.unsub) {
       this.unsub();
@@ -109,8 +109,17 @@ class Session extends EventEmitter {
     this.unsub = onSnapshot(docRef, (snapshot) => {
       this.#latestSelectedAnchor = snapshot.data().latestSelectedAnchor || null;
       console.log("Current anchor selected:", this.#latestSelectedAnchor);
-    }, (error) => {
-      console.error(`Error observing session ${this.id}:`, error);
+
+    //   const data = snapshot.data();
+    //   if (data && data.latestSelectedAnchor) {
+    //     this.#latestSelectedAnchor = data.latestSelectedAnchor;
+    //     logger.info(`Current anchor selected: ${this.#latestSelectedAnchor}`);
+    //   } else {
+    //     this.#latestSelectedAnchor = null;
+    //     logger.warn('No anchor found in session data.');
+    //   }
+    // }, (error) => {
+    //   logger.error(`Error observing session ${this.id}:`, error);
     });
   }
 
@@ -121,6 +130,7 @@ class Session extends EventEmitter {
     if (this.unsub) {
       this.unsub();
       this.unsub = null;
+      logger.info(`Cleaned up listeners for session ${this.id}`);
     }
   }
 }

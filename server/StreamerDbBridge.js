@@ -1,61 +1,75 @@
 // server/StreamerDbBridge.js
 import { CommandQueue } from './helpers/CommandQueue.js';
 import { Command } from './models/Command.js';
-// import { Session } from './models/Sessions.js'; // Ensure correct import
 
 class StreamerDbBridge {
-  constructor(streamer, session) {
+  constructor(streamer, session, logger) { // Removed 'io' from constructor
     this.streamer = streamer;
     this.session = session;
     this.commandQueue = new CommandQueue(this.streamer);
+    this.logger = logger;
+    this.isStarting = false; // Guard flag to prevent recursive starts
   }
 
   /**
    * Starts the bridge by connecting the streamer and initializing the session.
    */
   async start() {
-    await this.streamer.connect();
-    await this.session.init();
+    if (this.isStarting) {
+      this.logger.warn('StreamerDbBridge is already starting. Skipping redundant start.');
+      return;
+    }
 
-    // Listen for new commands from the session
-    this.session.onCommandCreated((data) => {
-      console.log('Command created for anchor:', data.anchor);
-      const command = new Command(this.streamer, this.session, data);
-      this.commandQueue.addCommand(command);
-      console.log('Command added to queue.');
-    });
+    this.isStarting = true;
 
-    // Listen for data points from the streamer
-    this.streamer.on('point', (point) => {
-      if (this.commandQueue.isInProgress) return;
-      console.log('Received point:', point);
-      this.session.addPoint(point);
-    });
+    try {
+      await this.streamer.connect();
+      await this.session.init();
 
-    // Handle streamer reset events
-    this.streamer.on('reset', () => {
-      console.log('-------------------------------- Resetting Streamer --------------------------------');
-      setTimeout(() => {
+      // Listen for new commands from the session
+      this.session.onCommandCreated((data) => {
+        this.logger.info(`Command created for anchor: ${data.anchor}`);
+        const command = new Command(this.streamer, this.session, data);
+        this.commandQueue.addCommand(command);
+        this.logger.info('Command added to queue.');
+      });
+
+      // Listen for data points from the streamer
+      this.streamer.on('point', (point) => {
+        if (this.commandQueue.isInProgress) return;
+        this.logger.info(`Received point: "${point}"`);
+        this.session.addPoint(point);
+      });
+
+      // Handle streamer reset events
+      this.streamer.on('reset', () => {
+        this.logger.warn('Resetting Streamer...');
+        setTimeout(() => {
+          this.commandQueue.clearCommandQueue();
+          if (this.streamer.socket) {
+            this.streamer.socket.end();
+            this.streamer.socket.destroy();
+          }
+          this.start(); // This is safe now due to the guard
+          this.logger.info('Streamer restarted.');
+        }, 2000);
+      });
+
+      // Handle socket timeouts
+      this.streamer.socket.once('timeout', () => {
+        this.logger.error('Socket timeout occurred. Attempting to reconnect...');
         this.commandQueue.clearCommandQueue();
         if (this.streamer.socket) {
           this.streamer.socket.end();
           this.streamer.socket.destroy();
         }
         this.start();
-        console.log('Streamer restarted.');
-      }, 2000);
-    });
-
-    // Handle socket timeouts
-    this.streamer.socket.once('timeout', () => {
-      console.log('Socket timeout. Attempting to reconnect...');
-      this.commandQueue.clearCommandQueue();
-      if (this.streamer.socket) {
-        this.streamer.socket.end();
-        this.streamer.socket.destroy();
-      }
-      this.start();
-    });
+      });
+    } catch (error) {
+      this.logger.error(`Error in StreamerDbBridge start: ${error.message}`);
+    } finally {
+      this.isStarting = false;
+    }
   }
 }
 

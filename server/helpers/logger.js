@@ -1,22 +1,43 @@
 // server/helpers/logger.js
-import { createLogger, format, transports } from 'winston';
+import winston from 'winston';
+import { EventEmitter } from 'events';
+import { Writable } from 'stream'; // Import Writable from 'stream'
 
-const logger = createLogger({
+// Create an instance of EventEmitter
+const loggerEmitter = new EventEmitter();
+
+// Define a custom Writable stream to emit log events
+const emitStream = new Writable({
+  write(chunk, encoding, callback) {
+    try {
+      const log = JSON.parse(chunk.toString());
+      loggerEmitter.emit('log', log);
+      callback();
+    } catch (error) {
+      // Handle JSON parse error if the log format is not JSON
+      console.error('Failed to parse log message:', chunk.toString());
+      callback(error);
+    }
+  }
+});
+
+// Define a custom transport to emit log events
+const emitTransport = new winston.transports.Stream({
+  stream: emitStream, // Use the proper Writable stream
+});
+
+// Create Winston logger with Console, File, and Emit transports
+const logger = winston.createLogger({
   level: 'info',
-  format: format.combine(
-    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
   ),
   transports: [
-    new transports.Console(),
-    new transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new transports.File({ filename: 'logs/combined.log' }),
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'combined.log' }),
+    emitTransport, // Custom transport to emit logs
   ],
 });
 
-// Export a function to add custom transports
-export const addLoggerTransport = (transport) => {
-  logger.add(transport);
-};
-
-export default logger;
+export { logger, loggerEmitter };
