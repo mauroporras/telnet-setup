@@ -55,7 +55,7 @@ app.post('/api/button', async (req, res) => {
 
   try {
     const data = await StreamerEntry(stationMac, sessionID, stationNames);
-    res.json({ message: 'Streamer started successfully.' });
+    res.json({ message: 'Streamer started successfully. index' });
     io.emit('stream-data', data); // Emit data to all connected clients
     logger.info('Streamer started successfully and data emitted to clients.');
   } catch (error) {

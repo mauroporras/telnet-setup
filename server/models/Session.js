@@ -109,6 +109,7 @@ class Session extends EventEmitter {
     this.unsub = onSnapshot(docRef, (snapshot) => {
       this.#latestSelectedAnchor = snapshot.data().latestSelectedAnchor || null;
       console.log("Current anchor selected:", this.#latestSelectedAnchor);
+      logger.info(`Current anchor selected: '${this.#latestSelectedAnchor}'`);
 
     //   const data = snapshot.data();
     //   if (data && data.latestSelectedAnchor) {

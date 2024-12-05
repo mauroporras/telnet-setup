@@ -40,6 +40,7 @@ class Command {
 
     console.log('------------------ \n');
     console.log('Command invoked for anchor:', this.data.anchor);
+    console.log('Position:', y, x, z);
 
     // Send initial commands
     this.streamer.send(TotalStationCommands.STOP_STREAM);

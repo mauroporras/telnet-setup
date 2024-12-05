@@ -38,6 +38,7 @@ class StreamerDbBridge {
       this.streamer.on('point', (point) => {
         if (this.commandQueue.isInProgress) return;
         this.logger.info(`Received point: "${point}"`);
+        // this.logger.data(point);
         this.session.addPoint(point);
       });
 

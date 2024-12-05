@@ -7,7 +7,8 @@ import { Box, Typography, CircularProgress } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import socket from '../socket' // Import the socket instance
 import { API_BASE_URL, WS_URL } from '../config' // Import config variables
-import logger from '../helpers/logger.js' // Import the logger helper
+import logger from '../helpers/loggers.js' // Import the logger helper
+// import logger from '../helpers/logger.js' // Import the logger helper
 
 
 const App = () => {
@@ -42,6 +43,7 @@ const App = () => {
         .then((data) => {
           setData(data.message)
           setLoading(false)
+          logger.info(data.message)
           logger.info('Streamer started successfully.')
         })
         .catch((error) => {
@@ -59,7 +61,7 @@ const App = () => {
     // Listen for 'stream-data' events
     socket.on('stream-data', (streamData) => {
       setData(streamData)
-      logger.info('Received stream data from server.')
+      logger.info('Received stream data from server.', streamData)
     })
 
     // Listen for 'log' events

@@ -49,25 +49,24 @@ class ClientSession {
     //   measurementId: "G-7X3BB5E4MG"
     // };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCIoL9RlD15JzJo1XDPBzTm1xR6StBUaxI",
-      authDomain: "csc-surveylink.firebaseapp.com",
-      projectId: "csc-surveylink",
-      storageBucket: "csc-surveylink.appspot.com",
-      messagingSenderId: "473701857342",
-      appId: "1:473701857342:web:73573aa5b8fc7db50b396f",
-      measurementId: "G-71DM2KZP94"
-    };
     // const firebaseConfig = {
-    //   apiKey: "AIzaSyDhrTyj2hISapfNqAyGEEb5p2s47wi9_mA",
-    //   authDomain: "zahner-development.firebaseapp.com",
-    //   databaseURL: "https://zahner-development-default-rtdb.firebaseio.com",
-    //   projectId: "zahner-development",
-    //   storageBucket: "zahner-development.appspot.com",
-    //   messagingSenderId: "71481654606",
-    //   appId: "1:71481654606:web:f8d33f05cc676ffe27721f",
-    //   measurementId: "G-7P92N16XE1"
+    //   apiKey: "AIzaSyCIoL9RlD15JzJo1XDPBzTm1xR6StBUaxI",
+    //   authDomain: "csc-surveylink.firebaseapp.com",
+    //   projectId: "csc-surveylink",
+    //   storageBucket: "csc-surveylink.appspot.com",
+    //   messagingSenderId: "473701857342",
+    //   appId: "1:473701857342:web:73573aa5b8fc7db50b396f",
+    //   measurementId: "G-71DM2KZP94"
     // };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWSkRhOgU5YniISzP6mZFv6hW2da2UgQ8",
+      authDomain: "zahner-shoplink.firebaseapp.com",
+      projectId: "zahner-shoplink",
+      storageBucket: "zahner-shoplink.firebasestorage.app",
+      messagingSenderId: "738414653328",
+      appId: "1:738414653328:web:ff50b30af879a374210d15",
+      measurementId: "G-4ZWR7MWR99"
+      };
     
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);

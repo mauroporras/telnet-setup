@@ -29,7 +29,7 @@ const StreamerEntry = async (stationMac, sessID, stationName) => {
   try {
     await streamerDbBridge.start();
     logger.info('StreamerDbBridge started successfully.');
-    return 'Streamer started successfully.';
+    return 'Streamer started successfully. bridge';
   } catch (error) {
     logger.error(`Error in StreamerEntry: ${error.message}`);
     throw error;
