@@ -1,6 +1,7 @@
 // server/StreamerDbBridge.js
 import { CommandQueue } from './helpers/CommandQueue.js';
-import { Command } from './models/Command.js';
+// import { Command } from './models/Command.js';
+
 
 class StreamerDbBridge {
   constructor(streamer, session, logger) { // Removed 'io' from constructor
@@ -25,13 +26,21 @@ class StreamerDbBridge {
     try {
       await this.streamer.connect();
       await this.session.init();
+      // Clear any pending old commands before starting
+      await this.session.clearPendingCommands();
+      // start the stream
+      this.streamer.send('%R8Q,5:\r\n') // stop stream
+      this.streamer.send('%R8Q,4:\r\n')// start stream
+
+      const { Command } = await import('./models/Command.js');
 
       // Listen for new commands from the session
       this.session.onCommandCreated((data) => {
         this.logger.info(`Command created for anchor: ${data.anchor}`);
+        
         const command = new Command(this.streamer, this.session, data);
         this.commandQueue.addCommand(command);
-        this.logger.info('Command added to queue.');
+        // this.logger.info('Command added to queue.', command);
       });
 
       // Listen for data points from the streamer

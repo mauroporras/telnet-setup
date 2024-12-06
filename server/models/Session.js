@@ -1,7 +1,7 @@
 // server/models/Session.js
 import { db, serverTimestamp } from '../helpers/firebase.js';
 import { zeaDebug } from '../helpers/zeaDebug.js';
-import { collection, doc, setDoc, getDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, onSnapshot, query, where, orderBy, getDocs } from 'firebase/firestore';
 import EventEmitter from 'events';
 import { logger } from '../helpers/logger.js'; // Import the initialized logger
 
@@ -37,12 +37,10 @@ class Session extends EventEmitter {
 
     logger.info(`Anchor selected: ${anchor}`);
     const theAnchor = anchor || this.#latestSelectedAnchor;
-    logger.info(`Anchor selected: ${anchor}`);
-    // Create a document reference for a new point
-    const docRef = doc(collection(db, 'points'));
 
+    const docRef = doc(collection(db, 'points'));
     const data = {
-      id: docRef.id, // Use docRef.id for the document ID
+      id: docRef.id,
       createdAt: serverTimestamp(),
       sessionId: this.id,
       anchor: theAnchor,
@@ -80,8 +78,28 @@ class Session extends EventEmitter {
       logger.error(`Error listening to commands for session ${this.id}:`, error);
     });
 
-    // Store the unsubscribe function to allow cleanup if needed
     this.unsub = unsub;
+  }
+
+  /**
+   * Clears any pending (non-invoked) commands from Firestore by marking them as invoked.
+   * This can be called once when the connection is established to prevent old commands from running again.
+   */
+  async clearPendingCommands() {
+    try {
+      const q = query(
+        collection(db, 'commands'),
+        where('sessionId', '==', this.id),
+        where('isInvoked', '==', false)
+      );
+      const snapshot = await getDocs(q);
+      for (const cmdDoc of snapshot.docs) {
+        await setDoc(doc(db, 'commands', cmdDoc.id), { isInvoked: true }, { merge: true });
+        logger.info(`Marked command ${cmdDoc.id} as invoked to clear pending backlog.`);
+      }
+    } catch (error) {
+      logger.error('Error clearing pending commands:', error);
+    }
   }
 
   /**
@@ -110,17 +128,8 @@ class Session extends EventEmitter {
       this.#latestSelectedAnchor = snapshot.data().latestSelectedAnchor || null;
       console.log("Current anchor selected:", this.#latestSelectedAnchor);
       logger.info(`Current anchor selected: '${this.#latestSelectedAnchor}'`);
-
-    //   const data = snapshot.data();
-    //   if (data && data.latestSelectedAnchor) {
-    //     this.#latestSelectedAnchor = data.latestSelectedAnchor;
-    //     logger.info(`Current anchor selected: ${this.#latestSelectedAnchor}`);
-    //   } else {
-    //     this.#latestSelectedAnchor = null;
-    //     logger.warn('No anchor found in session data.');
-    //   }
-    // }, (error) => {
-    //   logger.error(`Error observing session ${this.id}:`, error);
+    }, (error) => {
+      logger.error(`Error observing session ${this.id}:`, error);
     });
   }
 

@@ -4,10 +4,10 @@ import { collection, doc, setDoc } from 'firebase/firestore';
 
 const TotalStationCommands = {
   START_STREAM: '%R8Q,4:\r\n',
+  STOP_STREAM: '%R8Q,5:\r\n',
   turnTelescope: (x, y, z) => `%R8Q,7:1,${x},${y},${z}\r\n`,
   SAMPLE_DIST: '%R8Q,1:\r\n',
   SEARCH: '%R8Q,6:1\r\n',
-  STOP_STREAM: '%R8Q,5:\r\n',
 };
 
 const TotalStationResponses = {
@@ -27,79 +27,116 @@ class Command {
     this.streamer = streamer;
     this.session = session;
     this.data = data;
-    this.globalTimeout = 15000; // 15 seconds
+    this.globalTimeout = 30000; // 30 seconds
     this.timeoutHandle = null;
+    this.maxRetries = 2; // Attempt up to 2 times if reflector not found
+    this.attempts = 0;
   }
 
   async invoke() {
-    const { x, y, z } = this.data.position;
-
-    // Remove all listeners to avoid duplicate listeners
+    // Cleanup old listeners
     this.streamer.removeAllListeners('streaming-response');
     this.streamer.removeAllListeners('point');
+    this.streamer.removeAllListeners('end');
 
     console.log('------------------ \n');
     console.log('Command invoked for anchor:', this.data.anchor);
-    console.log('Position:', y, x, z);
 
-    // Send initial commands
-    this.streamer.send(TotalStationCommands.STOP_STREAM);
-    this.streamer.send(TotalStationCommands.START_STREAM);
+    const { x, y, z } = this.data.position;
+    console.log('Position:', x, y, z);
+
+    // Start the sequence of attempts
+    return this.#executeSequence(y, x, z);
+  }
+
+  async #executeSequence(x, y, z) {
+    this.attempts++;
+    console.log(`Attempt ${this.attempts}/${this.maxRetries} for anchor: ${this.data.anchor}`);
 
     const localQueue = [
-      TotalStationCommands.turnTelescope(y, x, z),
+      TotalStationCommands.STOP_STREAM,
+      TotalStationCommands.START_STREAM,
+      TotalStationCommands.turnTelescope(x, y, z),
       TotalStationCommands.SEARCH,
       TotalStationCommands.SAMPLE_DIST,
     ];
 
     return new Promise((resolve, reject) => {
+      let currentCommand = null;
+
+      const sendNextCommand = (cmd) => {
+        currentCommand = cmd;
+        console.log('Sending next command:', cmd.trim());
+        this.streamer.send(cmd);
+        this.resetTimeout(() => {
+          console.error('Command timed out.');
+          this.streamer.emit('end');
+          reject(new Error('Command timed out.'));
+        });
+      };
+
+      const handleReflectorNotFound = () => {
+        if (this.attempts < this.maxRetries) {
+          console.log(`Reflector not found. Retrying in 5 seconds... (Attempt ${this.attempts})`);
+          this.#cleanupListeners(onStreamingResponse, onPoint, onEnd);
+          setTimeout(() => {
+            this.#executeSequence(x, y, z).then(resolve).catch(reject);
+          }, 5000);
+        } else {
+          console.log(`Reflector not found after ${this.attempts} attempts. Stopping.`);
+          this.streamer.emit('end');
+          reject(new Error('GRC_REFLECTOR_NOT_FOUND'));
+        }
+      };
+
       const onStreamingResponse = async (response) => {
-        clearTimeout(this.timeoutHandle);
-        const responseCode = parseInt(response.substring(response.lastIndexOf(':') + 1));
+        this.clearTimeoutHandle();
+        const responseCode = parseInt(response.substring(response.lastIndexOf(':') + 1), 10);
 
         if (responseCode !== 0) {
           console.log('Response error:', TotalStationResponses[responseCode] || 'Unknown Error');
 
-          if ([28, 31, 41, 26, 50].includes(responseCode)) {
+          if (responseCode === 31) {
+            // Reflector not found, handle attempts
+            return handleReflectorNotFound();
+          }
+
+          // Other critical errors that we don't retry internally
+          if ([28, 41, 26, 50].includes(responseCode)) {
             this.streamer.emit('end');
-            reject(new Error(TotalStationResponses[responseCode] || 'Unknown Error'));
+            return reject(new Error(TotalStationResponses[responseCode] || 'Unknown Error'));
+          }
+
+          if (responseCode === 3107) {
+            console.log('Previous command still running (Code 3107), waiting 0.5 seconds');
+            this.clearTimeoutHandle();
+            // Resend the same command after a short delay, no attempt increment
+            setTimeout(() => {
+              sendNextCommand(currentCommand);
+            }, 500);
             return;
           }
         }
 
-        // Execute next command
-        let next = localQueue.shift();
-        if (!next) return;
-
-        if (responseCode === 3107) {
-          setTimeout(() => {
-            console.log('Previous command still running (Code 3107), waiting 0.5 seconds');
-            this.streamer.send(next);
-          }, 500);
-        } else {
-          console.log('Sending next command:', next.trim());
-          this.streamer.send(next);
+        // If no error or after handling non-fatal responses, move to the next command
+        const nextCommand = localQueue.shift();
+        if (!nextCommand) {
+          // No more commands: wait for 'point' or 'end' event
+          return;
         }
-
-        // Reset timeout for the next response
-        this.timeoutHandle = setTimeout(() => {
-          console.error('Command timed out.');
-          reject(new Error('Command timed out.'));
-        }, this.globalTimeout);
+        sendNextCommand(nextCommand);
       };
 
       const onEnd = async () => {
-        clearTimeout(this.timeoutHandle);
-        this.streamer.removeListener('streaming-response', onStreamingResponse);
-        this.streamer.removeListener('point', onPoint);
+        this.clearTimeoutHandle();
+        this.#cleanupListeners(onStreamingResponse, onPoint, onEnd);
         await this.#markAsInvoked();
         resolve();
       };
 
       const onPoint = async (point) => {
-        clearTimeout(this.timeoutHandle);
-        this.streamer.removeListener('streaming-response', onStreamingResponse);
-        this.streamer.removeListener('point', onPoint);
+        this.clearTimeoutHandle();
+        this.#cleanupListeners(onStreamingResponse, onPoint, onEnd);
 
         if (point === 'connection closed: too many clients') {
           console.log('Reset: connection closed due to too many clients.');
@@ -117,30 +154,35 @@ class Command {
         resolve();
       };
 
-      // Set initial timeout
-      this.timeoutHandle = setTimeout(() => {
-        console.error('Initial command timed out.');
-        reject(new Error('Initial command timed out.'));
-      }, this.globalTimeout);
-
       this.streamer.on('streaming-response', onStreamingResponse);
       this.streamer.on('end', onEnd);
       this.streamer.on('point', onPoint);
 
-      // Start the command sequence
-      if (localQueue.length > 0) {
-        const firstCommand = localQueue.shift();
-        console.log('Sending first command:', firstCommand.trim());
-        this.streamer.send(firstCommand);
-      } else {
-        reject(new Error('No commands to execute.'));
+      // Start with the first command
+      const firstCommand = localQueue.shift();
+      if (!firstCommand) {
+        return reject(new Error('No commands to execute.'));
       }
+      sendNextCommand(firstCommand);
     });
   }
 
-  /**
-   * Marks the command as invoked in Firestore.
-   */
+  resetTimeout(callback) {
+    this.clearTimeoutHandle();
+    this.timeoutHandle = setTimeout(callback, this.globalTimeout);
+  }
+
+  clearTimeoutHandle() {
+    if (this.timeoutHandle) clearTimeout(this.timeoutHandle);
+    this.timeoutHandle = null;
+  }
+
+  #cleanupListeners(onStreamingResponse, onPoint, onEnd) {
+    this.streamer.removeListener('streaming-response', onStreamingResponse);
+    this.streamer.removeListener('point', onPoint);
+    this.streamer.removeListener('end', onEnd);
+  }
+
   async #markAsInvoked() {
     try {
       const docRef = doc(collection(db, 'commands'), this.data.id);

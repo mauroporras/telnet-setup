@@ -10,7 +10,6 @@ import { API_BASE_URL, WS_URL } from '../config' // Import config variables
 import logger from '../helpers/loggers.js' // Import the logger helper
 // import logger from '../helpers/logger.js' // Import the logger helper
 
-
 const App = () => {
   const [buttonStatus, setButtonStatus] = useState(false)
   const [sessionIDValue, setSessionIDValue] = useState('')
@@ -174,13 +173,15 @@ const App = () => {
             Application Logs
           </Typography>
           <Box
-            sx={{
-              maxHeight: '300px',
-              overflowY: 'scroll',
-              border: '1px solid #ccc',
-              p: 2,
-            }}
-          >
+              sx={{
+                maxHeight: '300px',
+                overflowY: 'scroll',
+                border: '1px solid #ccc',
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column-reverse' // Add this line
+              }}
+            >
             {logs.length > 0 ? (
               logs.map((log, index) => (
                 <Typography key={index} variant="body2">
