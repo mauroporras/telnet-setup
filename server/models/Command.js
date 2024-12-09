@@ -135,9 +135,9 @@ class Command {
       };
 
       const onPoint = async (point) => {
-        this.clearTimeoutHandle();
+        clearTimeout(this.timeoutHandle);
         this.#cleanupListeners(onStreamingResponse, onPoint, onEnd);
-
+      
         if (point === 'connection closed: too many clients') {
           console.log('Reset: connection closed due to too many clients.');
           setTimeout(() => {
@@ -146,13 +146,19 @@ class Command {
           }, 5000);
           return;
         }
-
+      
         await this.#markAsInvoked();
         console.log(`ANCHOR: ${this.data.anchor}\nPOINT: ${point}`);
-        await this.session.addPoint(point, this.data.anchor);
+        
+        // Here we let the session determine the anchor if none is passed
+        // If you want to always use the current default anchor, omit `this.data.anchor`
+        // and just call `await this.session.addPoint(point)`
+        await this.session.addPoint(point, this.data.anchor); 
+      
         console.log('----Command Complete----');
         resolve();
       };
+      
 
       this.streamer.on('streaming-response', onStreamingResponse);
       this.streamer.on('end', onEnd);

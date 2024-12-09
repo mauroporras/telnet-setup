@@ -30,14 +30,15 @@ class Session extends EventEmitter {
    * @param {string} [anchor] - The anchor associated with the point.
    */
   async addPoint(point, anchor) {
-    if (!anchor && !this.#latestSelectedAnchor) {
+    // If no anchor passed in, fallback to the session's current default anchor
+    const theAnchor = anchor || this.#latestSelectedAnchor;
+  
+    if (!theAnchor) {
       logger.warn('Missing `anchor` and `latestSelectedAnchor`. Did you remember to #init the session?');
       return;
     }
-
-    logger.info(`Anchor selected: ${anchor}`);
-    const theAnchor = anchor || this.#latestSelectedAnchor;
-
+  
+    logger.info(`Anchor selected: ${theAnchor}`);
     const docRef = doc(collection(db, 'points'));
     const data = {
       id: docRef.id,
@@ -46,15 +47,15 @@ class Session extends EventEmitter {
       anchor: theAnchor,
       string: point,
     };
-
+  
     try {
       await setDoc(docRef, data);
-      zeaDebug("Created new point with id '%s' and anchor '%s'", docRef.id, theAnchor);
-      logger.info(`Point added to Firestore: ${point}`);
+      logger.info(`Point added to Firestore: ${point} for anchor: ${theAnchor}`);
     } catch (error) {
       logger.error('Error adding point to Firestore:', error);
     }
   }
+  
 
   /**
    * Sets up a listener for new commands in Firestore.

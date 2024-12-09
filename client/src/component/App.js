@@ -1,14 +1,13 @@
 // client/src/component/App.js
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import DropDownListSession from './DropDownListSession.js'
 import ButtonStart from './Button.js'
 import Output from './Output.js'
 import { Box, Typography, CircularProgress } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import socket from '../socket' // Import the socket instance
-import { API_BASE_URL, WS_URL } from '../config' // Import config variables
-import logger from '../helpers/loggers.js' // Import the logger helper
-// import logger from '../helpers/logger.js' // Import the logger helper
+import socket from '../socket'
+import { API_BASE_URL } from '../config'
+import logger from '../helpers/loggers.js' 
 
 const App = () => {
   const [buttonStatus, setButtonStatus] = useState(false)
@@ -18,7 +17,9 @@ const App = () => {
   const [data, setData] = useState(null)
   const [connectionStatus, setConnectionStatus] = useState('Start connection')
   const [loading, setLoading] = useState(false)
-  const [logs, setLogs] = useState([]) // State to hold logs
+  const [logs, setLogs] = useState([])
+
+  const logsContainerRef = useRef(null)
 
   useEffect(() => {
     if (buttonStatus) {
@@ -39,10 +40,10 @@ const App = () => {
 
       fetch(`${API_BASE_URL}/api/button`, requestOptions)
         .then((res) => res.json())
-        .then((data) => {
-          setData(data.message)
+        .then((respData) => {
+          setData(respData.message)
           setLoading(false)
-          logger.info(data.message)
+          logger.info(respData.message)
           logger.info('Streamer started successfully.')
         })
         .catch((error) => {
@@ -56,17 +57,13 @@ const App = () => {
     }
 
     // WebSocket event listeners
-
-    // Listen for 'stream-data' events
     socket.on('stream-data', (streamData) => {
       setData(streamData)
       logger.info('Received stream data from server.', streamData)
     })
 
-    // Listen for 'log' events
     socket.on('log', (log) => {
       setLogs((prevLogs) => [...prevLogs, log])
-      // Log the received log message using the logger helper
       switch (log.level) {
         case 'info':
           logger.info(log.message)
@@ -82,51 +79,43 @@ const App = () => {
       }
     })
 
-    // Listen for 'connect' event
     socket.on('connect', () => {
       setConnectionStatus('Connected')
       logger.info('WebSocket connected.')
     })
 
-    // Listen for 'disconnect' event
     socket.on('disconnect', () => {
       setConnectionStatus('Disconnected')
       logger.warn('WebSocket disconnected.')
     })
 
-    // Listen for 'connect_error' event
     socket.on('connect_error', (error) => {
       setConnectionStatus('Connection Error')
       logger.error(`WebSocket connection error: ${error.message}`)
       console.error('WebSocket connection error:', error)
     })
 
-    // Listen for 'reconnect_attempt' event
     socket.on('reconnect_attempt', () => {
       setConnectionStatus('Trying to reconnect')
       logger.warn('WebSocket attempting to reconnect.')
     })
 
-    // Listen for 'reconnect_error' event
     socket.on('reconnect_error', (error) => {
       setConnectionStatus('Reconnection Error')
       logger.error(`WebSocket reconnection error: ${error.message}`)
       console.error('WebSocket reconnection error:', error)
     })
 
-    // Listen for 'reconnect_failed' event
     socket.on('reconnect_failed', () => {
       setConnectionStatus('Failed to reconnect')
       logger.error('WebSocket failed to reconnect.')
     })
 
-    // Listen for 'reconnect' event
     socket.on('reconnect', () => {
       setConnectionStatus('Connected')
       logger.info('WebSocket reconnected.')
     })
 
-    // Cleanup on component unmount
     return () => {
       socket.off('stream-data')
       socket.off('log')
@@ -138,6 +127,15 @@ const App = () => {
       socket.off('reconnect')
     }
   }, [buttonStatus, sessionIDValue, stationIDValue, stationName])
+
+  // UseEffect to scroll to top whenever logs change
+  useEffect(() => {
+    if (logsContainerRef.current) {
+      // Since we are using column-reverse, the newest log is visually at the top
+      // Setting scrollTop = 0 ensures we always see the top (newest log)
+      logsContainerRef.current.scrollTop = 0
+    }
+  }, [logs])
 
   return (
     <ThemeProvider theme={createTheme()}>
@@ -173,15 +171,17 @@ const App = () => {
             Application Logs
           </Typography>
           <Box
-              sx={{
-                maxHeight: '300px',
-                overflowY: 'scroll',
-                border: '1px solid #ccc',
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column-reverse' // Add this line
-              }}
-            >
+            ref={logsContainerRef}
+            sx={{
+              maxHeight: '300px',
+              overflowY: 'scroll',
+              border: '1px solid #ccc',
+              p: 2,
+              display: 'flex',
+              // flexDirection: 'column-reverse'
+              flexDirection: 'column'
+            }}
+          >
             {logs.length > 0 ? (
               logs.map((log, index) => (
                 <Typography key={index} variant="body2">
